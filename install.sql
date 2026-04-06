@@ -181,3 +181,5 @@ CREATE TABLE IF NOT EXISTS `phone_installed_apps` (
     UNIQUE KEY `unique_app` (`owner`, `app_id`),
     INDEX `idx_owner` (`owner`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Compatibilidade: o app Chirper utiliza as colunas `rechirps` e `chirp_id`.

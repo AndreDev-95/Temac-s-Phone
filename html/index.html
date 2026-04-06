@@ -11,9 +11,11 @@
     <div id="phone-container" class="hidden">
         <div class="phone-frame">
             <!-- Dynamic Island -->
-            <div class="dynamic-island">
+            <div class="dynamic-island" id="dynamic-island">
                 <div class="island-content">
+                    <div class="island-speaker"></div>
                     <div class="island-camera"></div>
+                    <div class="island-live-dot"></div>
                 </div>
             </div>
             
@@ -32,23 +34,95 @@
                 </div>
             </div>
 
+            <!-- Control Center -->
+            <div class="control-center" id="control-center">
+                <div class="control-center-grabber"></div>
+                <div class="control-center-header">
+                    <span>Central de Controle</span>
+                    <button class="cc-close" onclick="closeControlCenter()"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="control-center-grid">
+                    <button class="cc-tile cc-square active" id="cc-wifi" onclick="toggleControlTile('wifi')">
+                        <i class="fas fa-wifi"></i><span>Wi‑Fi</span>
+                    </button>
+                    <button class="cc-tile cc-square active" id="cc-bluetooth" onclick="toggleControlTile('bluetooth')">
+                        <i class="fab fa-bluetooth-b"></i><span>Bluetooth</span>
+                    </button>
+                    <button class="cc-tile cc-square" id="cc-airplane" onclick="toggleControlTile('airplane')">
+                        <i class="fas fa-plane"></i><span>Avião</span>
+                    </button>
+                    <button class="cc-tile cc-square" id="cc-cellular" onclick="toggleControlTile('cellular')">
+                        <i class="fas fa-signal"></i><span>Dados</span>
+                    </button>
+                    <button class="cc-tile cc-rect active" id="cc-rotation" onclick="toggleControlTile('rotation')">
+                        <i class="fas fa-lock"></i><span>Rotação</span>
+                    </button>
+                    <button class="cc-tile cc-rect" id="cc-focus" onclick="toggleControlTile('focus')">
+                        <i class="fas fa-moon"></i><span>Foco</span>
+                    </button>
+                    <div class="cc-slider brightness">
+                        <div class="cc-slider-label"><i class="fas fa-sun"></i><span>Brilho</span></div>
+                        <input type="range" id="brightness-slider" min="35" max="100" value="92" oninput="setBrightness(this.value)">
+                    </div>
+                    <div class="cc-slider volume">
+                        <div class="cc-slider-label"><i class="fas fa-volume-up"></i><span>Volume</span></div>
+                        <input type="range" id="volume-slider" min="0" max="100" value="70">
+                    </div>
+                    <button class="cc-tile cc-wide" id="cc-flashlight" onclick="toggleControlTile('flashlight')">
+                        <i class="fas fa-bolt"></i><span>Lanterna</span>
+                    </button>
+                    <button class="cc-tile cc-wide" id="cc-camera" onclick="openApp('camera')">
+                        <i class="fas fa-camera"></i><span>Câmera</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Main Screen -->
             <div class="phone-screen" id="phone-screen">
                 <!-- Lock Screen -->
                 <div class="screen lock-screen active" id="lock-screen">
+                    <div class="lock-wallpaper wallpaper wallpaper1" id="lock-wallpaper"></div>
+                    <div class="lock-overlay"></div>
                     <div class="lock-time" id="lock-time">12:00</div>
                     <div class="lock-date" id="lock-date">Segunda-feira, 1 de Janeiro</div>
-                    <div class="lock-notifications" id="lock-notifications"></div>
-                    <div class="swipe-unlock">
-                        <i class="fas fa-chevron-up"></i>
-                        <span>Deslize para desbloquear</span>
+                    <div class="lock-notification-stack" id="lock-notifications"></div>
+                    <div class="face-id-overlay" id="face-id-overlay">
+                        <div class="face-id-ring">
+                            <div class="face-id-corners"></div>
+                            <div class="face-id-scan"></div>
+                            <i class="fas fa-face-smile face-id-icon"></i>
+                            <div class="face-id-success"><i class="fas fa-lock-open"></i></div>
+                        </div>
+                        <div class="face-id-text" id="face-id-text">Face ID</div>
+                    </div>
+                    <div class="lock-bottom-hint">
+                        <div class="swipe-unlock" id="swipe-unlock">
+                            <i class="fas fa-chevron-up"></i>
+                            <span>Deslize para abrir</span>
+                        </div>
+                    </div>
+                    <div class="lock-quick-actions">
+                        <button class="lock-action" onclick="toggleFlashlightAction(event)"><i class="fas fa-bolt"></i></button>
+                        <button class="lock-action" onclick="openQuickCamera(event)"><i class="fas fa-camera"></i></button>
                     </div>
                 </div>
 
                 <!-- Home Screen -->
                 <div class="screen home-screen" id="home-screen">
-                    <div class="wallpaper" id="wallpaper"></div>
+                    <div class="wallpaper wallpaper1" id="wallpaper"></div>
+                    <div class="home-tint"></div>
+                    <button class="control-center-handle" id="control-center-handle" onclick="openControlCenter()">
+                        <i class="fas fa-sliders-h"></i>
+                    </button>
                     <div class="app-grid" id="app-grid"></div>
+                    <div class="home-search-pill" id="home-search-pill">
+                        <i class="fas fa-search"></i>
+                        <span>Buscar</span>
+                    </div>
+                    <div class="home-page-dots">
+                        <span class="active"></span>
+                        <span></span>
+                    </div>
                     <div class="dock">
                         <div class="dock-app" data-app="phone">
                             <div class="app-icon phone-icon"><i class="fas fa-phone"></i></div>

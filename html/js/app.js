@@ -11,6 +11,12 @@ const PhoneState = {
     currentScreen: 'lock-screen',
     playerData: {},
     settings: {},
+    controlCenterOpen: false,
+    swipeStartY: null,
+    brightness: 92,
+    isUnlocking: false,
+    faceIdEnabled: true,
+    controlTiles: { wifi: true, bluetooth: true, airplane: false, cellular: false, rotation: true, focus: false, flashlight: false },
     // Data
     contacts: [],
     messages: [],
@@ -29,6 +35,7 @@ const PhoneState = {
     bankData: { cash: 0, bank: 0 },
     // Current states
     currentConversation: null,
+    messageTyping: {},
     currentNote: null,
     currentCall: null,
     currentEmail: null,
@@ -169,6 +176,35 @@ function getVisibleApps() {
     return apps;
 }
 
+function applyWallpaperToScreens(wallpaperName) {
+    const wallpaperClass = wallpaperName || 'wallpaper1';
+    const homeWallpaper = document.getElementById('wallpaper');
+    const lockWallpaper = document.getElementById('lock-wallpaper');
+    if (homeWallpaper) homeWallpaper.className = 'wallpaper ' + wallpaperClass;
+    if (lockWallpaper) lockWallpaper.className = 'lock-wallpaper wallpaper ' + wallpaperClass;
+}
+
+function updateBatteryDisplay() {
+    const batteryLevel = 100;
+    document.querySelectorAll('.battery span').forEach(el => {
+        el.textContent = `${batteryLevel}%`;
+    });
+}
+
+function pulseDynamicIsland(active = true) {
+    const island = document.querySelector('.dynamic-island');
+    if (!island) return;
+    island.style.transition = 'all 0.25s ease';
+    island.style.width = active ? '138px' : '129px';
+    island.style.boxShadow = active
+        ? 'inset 0 1px 1px rgba(255,255,255,0.06), 0 8px 22px rgba(0,0,0,0.52)'
+        : 'inset 0 1px 1px rgba(255,255,255,0.06), 0 4px 12px rgba(0,0,0,0.45)';
+    setTimeout(() => {
+        island.style.width = '129px';
+        island.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.06), 0 4px 12px rgba(0,0,0,0.45)';
+    }, 900);
+}
+
 // ============================================
 // INITIALIZATION
 // ============================================
@@ -180,11 +216,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateTime, 1000);
 });
 
+
 function initializeApps() {
     const appGrid = document.getElementById('app-grid');
     if (!appGrid) return;
     appGrid.innerHTML = '';
-    
+
     const apps = getVisibleApps();
     apps.forEach(app => {
         const appElement = document.createElement('div');
@@ -192,6 +229,7 @@ function initializeApps() {
         appElement.dataset.app = app.id;
         appElement.innerHTML = `
             <div class="app-icon ${app.color}">
+                <div class="ios-icon-gloss"></div>
                 <i class="${app.icon.includes('fab') ? app.icon : 'fas ' + app.icon}"></i>
             </div>
             <span class="app-name">${app.name}</span>
@@ -201,43 +239,62 @@ function initializeApps() {
     });
 }
 
+
+
 function initializeEventListeners() {
-    // Lock screen
     const lockScreen = document.getElementById('lock-screen');
-    if (lockScreen) lockScreen.addEventListener('click', unlockPhone);
-    
-    // Phone tabs
+    if (lockScreen) {
+        lockScreen.addEventListener('dblclick', () => {
+            if (PhoneState.currentScreen === 'lock-screen') startFaceIDUnlock();
+        });
+        lockScreen.addEventListener('click', (e) => {
+            if (e.target.closest('.lock-action')) return;
+            if (PhoneState.currentScreen === 'lock-screen' && !PhoneState.isUnlocking) {
+                pulseDynamicIsland(true);
+            }
+        });
+    }
+
+    initializeSwipeUnlock();
+
     document.querySelectorAll('.phone-tabs .tab').forEach(tab => {
         tab.addEventListener('click', (e) => switchPhoneTab(e.target.dataset.tab));
     });
-    
-    // Keypad
+
     document.querySelectorAll('.key').forEach(key => {
         key.addEventListener('click', (e) => addDigit(e.currentTarget.dataset.num));
     });
-    
-    // Dock apps
+
     document.querySelectorAll('.dock-app').forEach(app => {
         app.addEventListener('click', () => openApp(app.dataset.app));
     });
-    
-    // Tweet character counter
+
+    const homeSearchPill = document.getElementById('home-search-pill');
+    if (homeSearchPill) {
+        homeSearchPill.addEventListener('click', () => openApp('appstore'));
+    }
+
+    const controlCenter = document.getElementById('control-center');
+    if (controlCenter) {
+        controlCenter.addEventListener('click', (e) => {
+            if (e.target === controlCenter) closeControlCenter();
+        });
+    }
+
     const tweetContent = document.getElementById('tweet-content');
     if (tweetContent) {
         tweetContent.addEventListener('input', (e) => {
             document.getElementById('tweet-chars').textContent = e.target.value.length;
         });
     }
-    
-    // Message input enter key
+
     const messageInput = document.getElementById('message-input');
     if (messageInput) {
         messageInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
     }
-    
-    // Search inputs
+
     document.querySelectorAll('.search-bar input').forEach(input => {
         input.addEventListener('input', (e) => {
             const searchType = e.target.closest('.app-screen')?.id;
@@ -245,6 +302,8 @@ function initializeEventListeners() {
         });
     });
 }
+
+
 
 function initializeWallpapers() {
     const wallpaperGrid = document.getElementById('wallpaper-grid');
@@ -276,6 +335,33 @@ window.addEventListener('message', (event) => {
         case 'closePhone':
             closePhone();
             break;
+        case 'notification':
+            showNotification(data.title, data.message, data.icon || 'phone');
+            break;
+        case 'messagesConversationData':
+            PhoneState.currentConversation = data.number;
+            PhoneState.conversations[data.number] = data.messages || [];
+            if (PhoneState.currentScreen === 'messages-app') renderMessages();
+            break;
+        case 'messagesTyping':
+            PhoneState.messageTyping[data.number] = data.state === true;
+            if (PhoneState.currentScreen === 'messages-app') renderMessages();
+            break;
+        case 'chirperProfileData':
+            PhoneState.chirperProfile = data.profile || null;
+            renderChirps();
+            break;
+        case 'chirperTagData':
+            PhoneState.chirps = data.chirps || [];
+            renderChirps();
+            break;
+        case 'bankHistoryData':
+            PhoneState.bankHistory = data.history || [];
+            renderBank();
+            break;
+        case 'phoneLoading':
+            document.body.classList.toggle('phone-busy', !!data.active);
+            break;
         case 'receiveData':
             handleData(data.dataType, data.data);
             break;
@@ -291,8 +377,8 @@ window.addEventListener('message', (event) => {
         case 'newMessage':
             handleNewMessage(data.message);
             break;
-        case 'newTweet':
-            handleNewTweet(data.tweet);
+        case 'newChirp':
+            handleNewChirp(data.chirp);
             break;
         case 'flamerMatch':
             handleFlamerMatch(data.match);
@@ -316,29 +402,34 @@ window.addEventListener('message', (event) => {
 // ============================================
 // PHONE OPEN/CLOSE
 // ============================================
+
 function openPhone(playerData, time, settings) {
     PhoneState.isOpen = true;
     PhoneState.playerData = playerData || {};
     PhoneState.settings = settings || {};
-    
+
     document.getElementById('phone-container').classList.remove('hidden');
-    
-    // Apply wallpaper
-    const wallpaper = document.getElementById('wallpaper');
-    if (wallpaper) wallpaper.className = 'wallpaper ' + (settings?.wallpaper || 'wallpaper1');
-    
-    // Apply dark mode
-    if (settings?.darkMode) document.body.classList.add('dark-mode');
-    else document.body.classList.remove('dark-mode');
-    
-    // Update player info
-    const settingsName = document.getElementById('settings-name');
-    const settingsPhone = document.getElementById('settings-phone');
+
+    const playerName = document.getElementById('player-name');
+    const settingsName = document.getElementById('settings-player-name');
+    const settingsPhone = document.getElementById('settings-phone-number');
+
+    if (playerName) playerName.textContent = playerData?.name || 'Jogador';
     if (settingsName) settingsName.textContent = playerData?.name || 'Jogador';
     if (settingsPhone) settingsPhone.textContent = playerData?.phone || '000-0000';
-    
+
+    applyWallpaperToScreens(PhoneState.settings.wallpaper || 'wallpaper1');
+    setBrightness(PhoneState.brightness || 92, false);
+    closeControlCenter();
+    resetFaceID();
     showScreen('lock-screen');
+
+    if (PhoneState.faceIdEnabled !== false) {
+        startFaceIDUnlock();
+    }
 }
+
+
 
 function closePhone() {
     PhoneState.isOpen = false;
@@ -346,9 +437,25 @@ function closePhone() {
     sendNUI('closePhone');
 }
 
+
 function unlockPhone() {
-    showScreen('home-screen');
+    if (PhoneState.isUnlocking) return;
+    PhoneState.isUnlocking = true;
+
+    const lock = document.getElementById('lock-screen');
+    if (lock) {
+        lock.classList.add('unlocking');
+        setTimeout(() => lock.classList.remove('unlocking'), 450);
+    }
+
+    pulseDynamicIsland(true);
+    setTimeout(() => {
+        showScreen('home-screen');
+        PhoneState.isUnlocking = false;
+    }, 180);
 }
+
+
 
 // ============================================
 // SCREEN NAVIGATION
@@ -367,6 +474,7 @@ function showApp(appId) {
 }
 
 function openApp(appId) {
+    closeControlCenter();
     // Render app-specific content when opening
     if (appId === 'appstore') {
         renderAppStore();
@@ -383,7 +491,136 @@ function openApp(appId) {
 }
 
 function goHome() {
+    closeControlCenter();
     showScreen('home-screen');
+}
+
+
+function pulseDynamicIsland(active = true) {
+    const island = document.getElementById('dynamic-island');
+    if (!island) return;
+    island.classList.toggle('pulse', !!active);
+    if (active) {
+        clearTimeout(window.__temacIslandTimer);
+        window.__temacIslandTimer = setTimeout(() => island.classList.remove('pulse'), 350);
+    }
+}
+
+function openControlCenter() {
+    const panel = document.getElementById('control-center');
+    if (!panel) return;
+    PhoneState.controlCenterOpen = true;
+    panel.classList.add('active');
+    pulseDynamicIsland(true);
+}
+
+function closeControlCenter() {
+    const panel = document.getElementById('control-center');
+    if (!panel) return;
+    PhoneState.controlCenterOpen = false;
+    panel.classList.remove('active');
+}
+
+function toggleControlTile(tile) {
+    const current = !!PhoneState.controlTiles[tile];
+    PhoneState.controlTiles[tile] = !current;
+
+    const map = {
+        wifi: 'cc-wifi',
+        bluetooth: 'cc-bluetooth',
+        airplane: 'cc-airplane',
+        cellular: 'cc-cellular',
+        rotation: 'cc-rotation',
+        focus: 'cc-focus',
+        flashlight: 'cc-flashlight'
+    };
+
+    const el = document.getElementById(map[tile]);
+    if (el) {
+        el.classList.toggle('active', PhoneState.controlTiles[tile] && tile !== 'airplane' && tile !== 'flashlight');
+        el.classList.toggle('warning', tile === 'airplane' && PhoneState.controlTiles[tile]);
+        el.classList.toggle('utility', tile === 'flashlight' && PhoneState.controlTiles[tile]);
+    }
+
+    if (tile === 'flashlight') {
+        showNotification('Lanterna', PhoneState.controlTiles[tile] ? 'Lanterna ativada.' : 'Lanterna desativada.', 'camera');
+    }
+    if (tile === 'focus') {
+        showNotification('Foco', PhoneState.controlTiles[tile] ? 'Modo foco ativado.' : 'Modo foco desativado.', 'settings');
+    }
+}
+
+function setBrightness(value, showToast = true) {
+    PhoneState.brightness = Number(value);
+    const normalized = Math.max(35, Math.min(100, PhoneState.brightness)) / 100;
+    document.documentElement.style.setProperty('--phone-brightness', normalized.toFixed(2));
+    document.body.classList.add('phone-dim');
+    if (showToast) showNotification('Brilho', 'Brilho ajustado para ' + PhoneState.brightness + '%.', 'settings');
+}
+
+function initializeSwipeUnlock() {
+    const lockScreen = document.getElementById('lock-screen');
+    if (!lockScreen) return;
+
+    const start = (clientY) => {
+        PhoneState.swipeStartY = clientY;
+    };
+
+    const move = (clientY) => {
+        if (PhoneState.swipeStartY === null) return;
+        const delta = PhoneState.swipeStartY - clientY;
+        if (delta > 65) {
+            PhoneState.swipeStartY = null;
+            resetFaceID();
+            unlockPhone();
+        }
+    };
+
+    lockScreen.addEventListener('touchstart', (e) => start(e.touches[0].clientY), { passive: true });
+    lockScreen.addEventListener('touchmove', (e) => move(e.touches[0].clientY), { passive: true });
+    lockScreen.addEventListener('mousedown', (e) => start(e.clientY));
+    lockScreen.addEventListener('mousemove', (e) => {
+        if (e.buttons === 1) move(e.clientY);
+    });
+    window.addEventListener('mouseup', () => { PhoneState.swipeStartY = null; });
+}
+
+function resetFaceID() {
+    const overlay = document.getElementById('face-id-overlay');
+    const text = document.getElementById('face-id-text');
+    if (!overlay) return;
+    overlay.classList.remove('active', 'scanning', 'success');
+    if (text) text.textContent = 'Face ID';
+    clearTimeout(window.__temacFaceIdTimer1);
+    clearTimeout(window.__temacFaceIdTimer2);
+    clearTimeout(window.__temacFaceIdTimer3);
+}
+
+function startFaceIDUnlock() {
+    const overlay = document.getElementById('face-id-overlay');
+    const text = document.getElementById('face-id-text');
+    if (!overlay || PhoneState.currentScreen !== 'lock-screen') return;
+
+    resetFaceID();
+    overlay.classList.add('active');
+    pulseDynamicIsland(true);
+
+    window.__temacFaceIdTimer1 = setTimeout(() => {
+        overlay.classList.add('scanning');
+        if (text) text.textContent = 'Autenticando...';
+    }, 120);
+
+    window.__temacFaceIdTimer2 = setTimeout(() => {
+        overlay.classList.remove('scanning');
+        overlay.classList.add('success');
+        if (text) text.textContent = 'Desbloqueado';
+        pulseDynamicIsland(true);
+    }, 1150);
+
+    window.__temacFaceIdTimer3 = setTimeout(() => {
+        resetFaceID();
+        unlockPhone();
+    }, 1650);
 }
 
 // ============================================
@@ -394,17 +631,20 @@ function updateTime() {
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const timeString = `${hours}:${minutes}`;
-    
+
     const phoneTime = document.getElementById('phone-time');
     const lockTime = document.getElementById('lock-time');
     if (phoneTime) phoneTime.textContent = timeString;
     if (lockTime) lockTime.textContent = timeString;
-    
-    const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
-    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-    
+
     const lockDate = document.getElementById('lock-date');
-    if (lockDate) lockDate.textContent = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]}`;
+    if (lockDate) {
+        const weekday = now.toLocaleDateString('pt-BR', { weekday: 'long' });
+        const month = now.toLocaleDateString('pt-BR', { month: 'long' });
+        const formattedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1);
+        const formattedMonth = month.charAt(0).toUpperCase() + month.slice(1);
+        lockDate.textContent = `${formattedWeekday}, ${now.getDate()} de ${formattedMonth}`;
+    }
 }
 
 // ============================================
@@ -784,7 +1024,7 @@ function renderChirps() {
                 <div class="chirp-actions">
                     <button class="chirp-action"><i class="far fa-comment"></i> 0</button>
                     <button class="chirp-action ${chirp.retweeted ? 'rechirped' : ''}" onclick="rechirp(${chirp.id})">
-                        <i class="fas fa-retweet"></i> ${chirp.retweets || 0}
+                        <i class="fas fa-retweet"></i> ${chirp.rechirps || 0}
                     </button>
                     <button class="chirp-action ${chirp.user_liked ? 'liked' : ''}" onclick="likeChirp(${chirp.id})">
                         <i class="${chirp.user_liked ? 'fas' : 'far'} fa-heart"></i> ${chirp.likes || 0}
@@ -833,7 +1073,7 @@ function rechirp(chirpId) {
     sendNUI('rechirp', { chirpId });
     const chirp = PhoneState.chirps.find(t => t.id === chirpId);
     if (chirp) {
-        chirp.retweets = (chirp.retweets || 0) + 1;
+        chirp.rechirps = (chirp.rechirps || 0) + 1;
         renderChirps();
     }
 }
@@ -1670,6 +1910,17 @@ function openAppFromStore(appId) {
     setTimeout(() => openApp(appId), 300);
 }
 
+function toggleFlashlightAction(event) {
+    event.stopPropagation();
+    pulseDynamicIsland(true);
+    showNotification('Lanterna', 'Atalho visual do iPhone ativado.', 'phone');
+}
+
+function openQuickCamera(event) {
+    event.stopPropagation();
+    pulseDynamicIsland(true);
+    openApp('camera');
+}
 // ============================================
 // NOTIFICATIONS
 // ============================================
@@ -1769,6 +2020,10 @@ function hashCode(str) {
 // ============================================
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && PhoneState.isOpen) {
+        if (PhoneState.controlCenterOpen) {
+            closeControlCenter();
+            return;
+        }
         closePhone();
     }
 });
@@ -1792,3 +2047,31 @@ document.addEventListener('keydown', (e) => {
 //         { id: 1, author: 'test', author_name: 'Teste', content: 'Olá mundo! #FiveM', likes: 10, retweets: 2 }
 //     ]);
 // }, 500);
+
+
+// UX polish helpers injected by Temac build
+const __temacOriginalRenderMessages = typeof renderMessages === 'function' ? renderMessages : null;
+renderMessages = function() {
+    if (__temacOriginalRenderMessages) __temacOriginalRenderMessages();
+    const input = document.getElementById('message-input');
+    if (input && PhoneState.currentConversation && PhoneState.messageTyping[PhoneState.currentConversation]) {
+        input.placeholder = 'A escrever...';
+    } else if (input) {
+        input.placeholder = 'iMessage';
+    }
+};
+
+const __temacOriginalRenderBank = typeof renderBank === 'function' ? renderBank : null;
+renderBank = function() {
+    if (__temacOriginalRenderBank) __temacOriginalRenderBank();
+    const app = document.getElementById('bank-app');
+    if (!app) return;
+    let wrap = app.querySelector('.temac-bank-history');
+    if (!wrap) {
+        wrap = document.createElement('div');
+        wrap.className = 'temac-bank-history';
+        app.querySelector('.app-content')?.appendChild(wrap);
+    }
+    const rows = (PhoneState.bankHistory || []).map(row => `<div class="temac-bank-row"><span>${row.title}</span><strong>$${row.amount}</strong></div>`).join('');
+    wrap.innerHTML = `<div class="section-title">Resumo</div>${rows}`;
+};

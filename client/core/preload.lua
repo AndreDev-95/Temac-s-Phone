@@ -1,13 +1,10 @@
 -- Preload System
-
-PhonePreload = {}
+PhonePreload = PhonePreload or {}
 
 function PhonePreload:Load(app)
-    print('[PHONE] Preloading app: ' .. app)
+    print('[TEMAC PHONE] Preloading app: ' .. tostring(app))
 end
 
 function PhonePreload:Init(apps)
-    for _, app in pairs(apps) do
-        self:Load(app)
-    end
+    for _, app in pairs(apps or {}) do self:Load(app) end
 end

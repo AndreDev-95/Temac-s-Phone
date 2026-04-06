@@ -59,11 +59,19 @@ function SendMessages(source, identifier)
 end
 
 function SendChirper(source, identifier)
-    local tweets = MySQL.query.await([[
-        SELECT t.*, (SELECT COUNT(*) FROM phone_chirper_likes WHERE tweet_id = t.id AND user_id = ?) as user_liked
-        FROM phone_chirper t ORDER BY t.created_at DESC LIMIT ?
-    ]], {identifier, Config.Chirper.maxTweets})
-    TriggerClientEvent('phone:receiveData', source, 'twitter', tweets or {})
+    local prefix = Config.Database.prefix
+    local chirps = MySQL.query.await(([[
+        SELECT c.*, (
+            SELECT COUNT(*)
+            FROM %schirper_likes cl
+            WHERE cl.chirp_id = c.id AND cl.user_id = ?
+        ) as user_liked
+        FROM %schirper c
+        ORDER BY c.created_at DESC
+        LIMIT ?
+    ]]):format(prefix, prefix), {identifier, Config.Chirper.maxTweets})
+
+    TriggerClientEvent('phone:receiveData', source, 'chirper', chirps or {})
 end
 
 function SendPictura(source, identifier)

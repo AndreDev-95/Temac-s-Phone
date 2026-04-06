@@ -1,11 +1,6 @@
 -- Notification Manager
+PhoneNotify = PhoneNotify or {}
 
-PhoneNotify = {}
-
-function PhoneNotify:Send(title, message)
-    SendNUIMessage({
-        type = 'notification',
-        title = title,
-        message = message
-    })
+function PhoneNotify:Send(title, message, icon)
+    SendNUIMessage({ type = 'notification', title = title, message = message, icon = icon or 'phone' })
 end

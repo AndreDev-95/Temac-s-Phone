@@ -13,7 +13,7 @@ Config.Framework = 'auto' -- 'auto', 'esx', 'qbcore', 'vrp', 'standalone'
 -- ============================================
 -- GENERAL
 -- ============================================
-Config.OpenKey = 'M'
+Config.OpenKey = 'K'
 Config.PhoneModel = 'iphone15'
 Config.DefaultWallpaper = 'wallpaper1'
 Config.Locale = 'pt'

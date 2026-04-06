@@ -17,7 +17,11 @@ local phoneProp = nil
 -- COMMANDS & KEYBINDS
 -- ============================================
 RegisterCommand('phone', function()
-    TogglePhone()
+    SafeExecute(function()
+        SafeTogglePhone(function()
+            TogglePhone()
+        end)
+    end)
 end, false)
 
 RegisterKeyMapping('phone', 'Abrir Celular', 'keyboard', Config.OpenKey)
@@ -29,7 +33,13 @@ function TogglePhone()
     if PhoneData.isOpen then
         ClosePhone()
     else
-        OpenPhone()
+        if PhoneActions then
+            PhoneActions:Execute(function()
+                OpenPhone()
+            end)
+        else
+            OpenPhone()
+        end
     end
 end
 
@@ -37,6 +47,8 @@ end
 -- OPEN PHONE
 -- ============================================
 function OpenPhone()
+    if PhoneCore and not PhoneCore:CanOpen() then return end
+    if PhoneLoading then PhoneLoading:Start() end
     -- Check if player has phone item
     if Config.RequireItem and not Framework.HasItem(Config.PhoneItem) then
         Framework.Notify(_U('no_phone'), 'error')
@@ -62,12 +74,18 @@ function OpenPhone()
     
     -- Request data from server
     TriggerServerEvent('phone:requestAllData')
+    if PhoneLifecycle then PhoneLifecycle:Open('home') end
+    if PhonePreload then PhonePreload:Init({'messages', 'chirper', 'bank'}) end
+    SetTimeout(250, function()
+        if PhoneLoading then PhoneLoading:Stop() end
+    end)
 end
 
 -- ============================================
 -- CLOSE PHONE
 -- ============================================
 function ClosePhone()
+    if PhoneLifecycle then PhoneLifecycle:Close(PhoneCore and PhoneCore:GetCurrentApp() or 'home') end
     PhoneData.isOpen = false
     SetNuiFocus(false, false)
     

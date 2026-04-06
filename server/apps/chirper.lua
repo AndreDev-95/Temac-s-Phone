@@ -75,3 +75,25 @@ AddEventHandler('phone:chirper:delete', function(chirpId)
     MySQL.query('DELETE FROM ' .. prefix .. 'chirper WHERE id = ? AND author = ?', {chirpId, identifier})
     MySQL.query('DELETE FROM ' .. prefix .. 'chirper_likes WHERE chirp_id = ?', {chirpId})
 end)
+
+
+-- ============================================
+-- PROFILE DATA
+-- ============================================
+RegisterNetEvent('phone:chirper:profile')
+AddEventHandler('phone:chirper:profile', function(userId)
+    local source = source
+    local profileRows = MySQL.query.await('SELECT author as user_id, author_name, COUNT(*) as chirps, SUM(likes) as total_likes FROM ' .. prefix .. 'chirper WHERE author = ? GROUP BY author, author_name LIMIT 1', {userId}) or {}
+    TriggerClientEvent('phone:chirper:profileData', source, profileRows[1] or { user_id = userId, author_name = 'Utilizador', chirps = 0, total_likes = 0 })
+end)
+
+-- ============================================
+-- TAG SEARCH
+-- ============================================
+RegisterNetEvent('phone:chirper:tag')
+AddEventHandler('phone:chirper:tag', function(tag)
+    local source = source
+    local pattern = '%' .. tostring(tag or '') .. '%'
+    local rows = MySQL.query.await('SELECT * FROM ' .. prefix .. 'chirper WHERE content LIKE ? ORDER BY id DESC LIMIT 25', {pattern}) or {}
+    TriggerClientEvent('phone:chirper:tagData', source, tag, rows)
+end)

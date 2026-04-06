@@ -83,3 +83,18 @@ AddEventHandler('phone:bank:transfer', function(toAccount, amount, note)
         TriggerClientEvent('phone:notification', source, 'Banco', 'Conta não encontrada!', 'bank')
     end
 end)
+
+
+-- ============================================
+-- OVERVIEW / HISTORY
+-- ============================================
+RegisterNetEvent('phone:bank:overview')
+AddEventHandler('phone:bank:overview', function()
+    local source = source
+    local history = {
+        { title = 'Saldo disponível', amount = Framework.GetBank(source), type = 'info' },
+        { title = 'Dinheiro em mão', amount = Framework.GetMoney(source), type = 'info' }
+    }
+    TriggerClientEvent('phone:bank:historyData', source, history)
+    TriggerClientEvent('phone:updateBalance', source, Framework.GetMoney(source), Framework.GetBank(source))
+end)

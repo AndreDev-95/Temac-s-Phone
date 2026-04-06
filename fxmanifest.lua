@@ -20,6 +20,20 @@ shared_scripts {
 -- CLIENT SCRIPTS
 -- ============================================
 client_scripts {
+    -- Core
+    'client/core/error.lua',
+    'client/core/state.lua',
+    'client/core/optimization.lua',
+    'client/core/loading.lua',
+    'client/core/actions.lua',
+    'client/core/queue.lua',
+    'client/core/events.lua',
+    'client/core/lifecycle.lua',
+    'client/core/notify.lua',
+    'client/core/sync.lua',
+    'client/core/session.lua',
+    'client/core/preload.lua',
+    'client/core/permissions.lua',
     'client/main.lua',
     'client/framework.lua',
     'client/nui.lua',

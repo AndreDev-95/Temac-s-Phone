@@ -66,7 +66,7 @@ Citizen.CreateThread(function()
             content TEXT NOT NULL,
             image TEXT,
             likes INT DEFAULT 0,
-            retweets INT DEFAULT 0,
+            rechirps INT DEFAULT 0,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             INDEX idx_author (author)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
@@ -75,12 +75,18 @@ Citizen.CreateThread(function()
     MySQL.query([[
         CREATE TABLE IF NOT EXISTS ]] .. prefix .. [[chirper_likes (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            tweet_id INT NOT NULL,
+            chirp_id INT NOT NULL,
             user_id VARCHAR(50) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE KEY unique_like (tweet_id, user_id)
+            UNIQUE KEY unique_like (chirp_id, user_id)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ]])
+
+    -- Chirper migrations / compatibility with older schemas
+    MySQL.query('ALTER TABLE ' .. prefix .. 'chirper ADD COLUMN IF NOT EXISTS rechirps INT DEFAULT 0')
+    MySQL.query('ALTER TABLE ' .. prefix .. 'chirper_likes ADD COLUMN IF NOT EXISTS chirp_id INT NULL')
+    MySQL.query('UPDATE ' .. prefix .. 'chirper SET rechirps = retweets WHERE rechirps = 0 AND retweets IS NOT NULL')
+    MySQL.query('UPDATE ' .. prefix .. 'chirper_likes SET chirp_id = tweet_id WHERE chirp_id IS NULL AND tweet_id IS NOT NULL')
     
     -- Pictura
     MySQL.query([[

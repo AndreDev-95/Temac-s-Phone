@@ -1,13 +1,10 @@
 -- Sync System
+PhoneSync = PhoneSync or {}
 
-PhoneSync = {}
-
-function PhoneSync:Request(event)
-    TriggerServerEvent('phone:syncRequest', event)
+function PhoneSync:Request(event, payload)
+    TriggerServerEvent('phone:syncRequest', event, payload)
 end
 
 function PhoneSync:Receive(event, data)
-    if PhoneEvents then
-        PhoneEvents:Emit(event, data)
-    end
+    if PhoneEvents then PhoneEvents:Emit(event, data) end
 end

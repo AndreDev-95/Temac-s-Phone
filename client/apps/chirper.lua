@@ -21,7 +21,7 @@ RegisterNUICallback('unlikeChirp', function(data, cb)
     cb('ok')
 end)
 
-RegisterNUICallback('rechirpChirp', function(data, cb)
+RegisterNUICallback('rechirp', function(data, cb)
     TriggerServerEvent('phone:chirper:rechirp', data.chirpId)
     cb('ok')
 end)
@@ -41,6 +41,17 @@ RegisterNUICallback('unfollowChirper', function(data, cb)
     cb('ok')
 end)
 
+
+RegisterNUICallback('getChirperProfile', function(data, cb)
+    TriggerServerEvent('phone:chirper:profile', data.userId)
+    cb('ok')
+end)
+
+RegisterNUICallback('searchChirperTag', function(data, cb)
+    TriggerServerEvent('phone:chirper:tag', data.tag)
+    cb('ok')
+end)
+
 -- ============================================
 -- SERVER EVENTS
 -- ============================================
@@ -50,4 +61,14 @@ AddEventHandler('phone:chirper:newChirp', function(chirpData)
         type = 'newChirp',
         chirp = chirpData
     })
+end)
+
+RegisterNetEvent('phone:chirper:profileData')
+AddEventHandler('phone:chirper:profileData', function(profile)
+    SendNUIMessage({ type = 'chirperProfileData', profile = profile })
+end)
+
+RegisterNetEvent('phone:chirper:tagData')
+AddEventHandler('phone:chirper:tagData', function(tag, chirps)
+    SendNUIMessage({ type = 'chirperTagData', tag = tag, chirps = chirps })
 end)

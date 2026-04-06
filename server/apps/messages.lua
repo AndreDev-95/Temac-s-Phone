@@ -64,3 +64,28 @@ AddEventHandler('phone:messages:markRead', function(number)
     MySQL.query('UPDATE ' .. prefix .. 'messages SET is_read = TRUE WHERE sender = ? AND receiver = ?',
         {number, identifier})
 end)
+
+
+-- ============================================
+-- CONVERSATION DATA
+-- ============================================
+RegisterNetEvent('phone:messages:conversation')
+AddEventHandler('phone:messages:conversation', function(number)
+    local source = source
+    local identifier = Framework.GetPhone(source) or Framework.GetIdentifier(source)
+    local rows = MySQL.query.await('SELECT * FROM ' .. prefix .. 'messages WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY id ASC',
+        {identifier, number, number, identifier}) or {}
+    TriggerClientEvent('phone:messages:conversationData', source, number, rows)
+end)
+
+-- ============================================
+-- TYPING STATE
+-- ============================================
+RegisterNetEvent('phone:messages:typing')
+AddEventHandler('phone:messages:typing', function(number, state)
+    local source = source
+    local receiverSource = Framework.GetPlayerByPhone(number)
+    if receiverSource then
+        TriggerClientEvent('phone:messages:typing', receiverSource, Framework.GetPhone(source) or Framework.GetIdentifier(source), state == true)
+    end
+end)
