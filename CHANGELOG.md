@@ -37,3 +37,10 @@
 - tratamento visual de estado busy
 - resumo bancário na interface
 - placeholders e comportamento mais próximo de iPhone
+
+### feat(messages-v1.1)
+- persistência ajustada para Qbox usando `citizenid` + número do `charinfo.phone`
+- envio sincronizado para emissor e recetor sem duplicar mensagens na UI
+- conversa dedicada agora recarrega do servidor e marca lidas ao abrir
+- entrega offline mantida por DB ao reabrir o telefone
+- queries otimizadas para unread e histórico recente

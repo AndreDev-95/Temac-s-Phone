@@ -183,3 +183,14 @@ CREATE TABLE IF NOT EXISTS `phone_installed_apps` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Compatibilidade: o app Chirper utiliza as colunas `rechirps` e `chirp_id`.
+
+
+-- ============================================
+-- Messages v1.1 (compatibilidade / upgrade)
+-- ============================================
+ALTER TABLE `phone_messages`
+    ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+-- Índices recomendados para bases já existentes (execute apenas se ainda não existirem):
+-- CREATE INDEX `idx_sender_receiver` ON `phone_messages` (`sender`, `receiver`);
+-- CREATE INDEX `idx_receiver_read` ON `phone_messages` (`receiver`, `is_read`);

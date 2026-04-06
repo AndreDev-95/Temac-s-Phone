@@ -175,3 +175,5 @@ feat(lockscreen): adiciona animação Face ID estilo iPhone
 ### UI
 - Busy state visual
 - Melhorias de UX em mensagens e banco
+
+- Beta: Messages v1.1 com persistência por número de telefone, entrega offline via banco, sync em tempo real para emissor/recetor e conversa dedicada atualizada ao vivo.

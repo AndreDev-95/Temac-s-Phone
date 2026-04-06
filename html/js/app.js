@@ -341,7 +341,9 @@ window.addEventListener('message', (event) => {
         case 'messagesConversationData':
             PhoneState.currentConversation = data.number;
             PhoneState.conversations[data.number] = data.messages || [];
-            if (PhoneState.currentScreen === 'messages-app') renderMessages();
+            if (PhoneState.currentScreen === 'messages-app' || PhoneState.currentScreen === 'message-conversation') {
+                renderCurrentConversation();
+            }
             break;
         case 'messagesTyping':
             PhoneState.messageTyping[data.number] = data.state === true;
@@ -894,62 +896,76 @@ function filterContacts(query) {
 function renderConversations() {
     const list = document.getElementById('conversations-list');
     if (!list) return;
-    
+
     const conversations = {};
     PhoneState.messages.forEach(msg => {
         const otherId = msg.sender === PhoneState.playerData.phone ? msg.receiver : msg.sender;
+        if (!otherId) return;
+
         if (!conversations[otherId]) {
             conversations[otherId] = {
                 id: otherId,
-                name: msg.sender_name || otherId,
+                name: msg.sender === PhoneState.playerData.phone ? (msg.receiver_name || otherId) : (msg.sender_name || otherId),
                 lastMessage: msg.message,
                 time: msg.created_at,
-                unread: !msg.is_read && msg.receiver === PhoneState.playerData.phone
+                unread: 0
             };
         }
+
+        if (!msg.is_read && msg.receiver === PhoneState.playerData.phone) {
+            conversations[otherId].unread += 1;
+        }
     });
-    
-    PhoneState.conversations = conversations;
-    const convArray = Object.values(conversations);
-    
+
+    const convArray = Object.values(conversations).sort((a, b) => new Date(b.time || 0) - new Date(a.time || 0));
+
     if (convArray.length === 0) {
         list.innerHTML = '<div class="empty-state"><i class="fas fa-comment"></i><p>Nenhuma mensagem</p></div>';
         return;
     }
-    
+
     list.innerHTML = convArray.map(conv => `
-        <div class="conversation-item" onclick="openConversation('${conv.id}', '${conv.name}')">
-            <div class="avatar" style="background: hsl(${hashCode(conv.name) % 360}, 70%, 50%)">
-                <span>${conv.name.charAt(0).toUpperCase()}</span>
+        <div class="conversation-item" onclick="openConversation('${conv.id}', ${JSON.stringify(String(conv.name || conv.id))})">
+            <div class="avatar" style="background: hsl(${hashCode(conv.name || conv.id) % 360}, 70%, 50%)">
+                <span>${String(conv.name || conv.id).charAt(0).toUpperCase()}</span>
             </div>
             <div class="conversation-info">
-                <div class="conversation-name">${conv.name}</div>
-                <div class="conversation-preview">${truncate(conv.lastMessage, 30)}</div>
+                <div class="conversation-name">${conv.name || conv.id}</div>
+                <div class="conversation-preview">${truncate(conv.lastMessage || '', 30)}</div>
             </div>
             <div class="conversation-time">${formatTime(conv.time)}</div>
-            ${conv.unread ? '<div class="unread-dot"></div>' : ''}
+            ${conv.unread ? `<div class="unread-dot">${conv.unread > 9 ? '9+' : conv.unread}</div>` : ''}
         </div>
     `).join('');
+}
+
+function renderCurrentConversation() {
+    const container = document.getElementById('messages-container');
+    if (!container || !PhoneState.currentConversation) return;
+
+    const msgs = PhoneState.conversations[PhoneState.currentConversation]
+        || PhoneState.messages
+            .filter(m => m.sender === PhoneState.currentConversation || m.receiver === PhoneState.currentConversation)
+            .sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
+
+    container.innerHTML = msgs.map(msg => `
+        <div class="message-bubble ${msg.sender === PhoneState.playerData.phone ? 'sent' : 'received'}">
+            ${msg.message}
+        </div>
+    `).join('');
+
+    container.scrollTop = container.scrollHeight;
 }
 
 function openConversation(id, name) {
     PhoneState.currentConversation = id;
     const nameEl = document.getElementById('conversation-name');
-    if (nameEl) nameEl.textContent = name;
-    
-    const container = document.getElementById('messages-container');
-    if (!container) return;
-    
-    const msgs = PhoneState.messages.filter(m => m.sender === id || m.receiver === id);
-    container.innerHTML = msgs.reverse().map(msg => `
-        <div class="message-bubble ${msg.sender === PhoneState.playerData.phone ? 'sent' : 'received'}">
-            ${msg.message}
-        </div>
-    `).join('');
-    
+    if (nameEl) nameEl.textContent = name || id;
+
     showScreen('message-conversation');
-    container.scrollTop = container.scrollHeight;
-    
+    renderCurrentConversation();
+
+    sendNUI('openConversation', { number: id });
     sendNUI('markAsRead', { number: id });
 }
 
@@ -967,32 +983,41 @@ function showNewMessage() {
 function sendMessage() {
     const input = document.getElementById('message-input');
     const message = input?.value.trim();
-    
+
     if (message && PhoneState.currentConversation) {
         sendNUI('sendMessage', { to: PhoneState.currentConversation, message });
-        
-        const container = document.getElementById('messages-container');
-        if (container) {
-            container.innerHTML += `<div class="message-bubble sent">${message}</div>`;
-            container.scrollTop = container.scrollHeight;
-        }
+        sendNUI('messagesTyping', { number: PhoneState.currentConversation, state: false });
         input.value = '';
     }
 }
 
 function handleNewMessage(msg) {
-    PhoneState.messages.unshift(msg);
-    renderConversations();
-    
-    if (PhoneState.currentConversation === msg.sender) {
-        const container = document.getElementById('messages-container');
-        if (container) {
-            container.innerHTML += `<div class="message-bubble received">${msg.message}</div>`;
-            container.scrollTop = container.scrollHeight;
+    if (!msg) return;
+
+    const exists = msg.id && PhoneState.messages.some(existing => existing.id === msg.id);
+    if (!exists) {
+        PhoneState.messages.unshift(msg);
+    }
+
+    const otherId = msg.sender === PhoneState.playerData.phone ? msg.receiver : msg.sender;
+    if (otherId) {
+        if (!PhoneState.conversations[otherId]) PhoneState.conversations[otherId] = [];
+        const inConversation = msg.id && PhoneState.conversations[otherId].some(existing => existing.id === msg.id);
+        if (!inConversation) {
+            PhoneState.conversations[otherId].push(msg);
+            PhoneState.conversations[otherId].sort((a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0));
         }
     }
-    
-    showNotification('Mensagem', msg.message, 'messages');
+
+    renderConversations();
+
+    if (PhoneState.currentConversation === otherId) {
+        renderCurrentConversation();
+    }
+
+    if (msg.sender !== PhoneState.playerData.phone) {
+        showNotification('Mensagem', msg.message, 'messages');
+    }
 }
 
 // ============================================

@@ -48,14 +48,23 @@ function SendContacts(source, identifier)
 end
 
 function SendMessages(source, identifier)
-    local messages = MySQL.query.await([[
+    local prefix = Config.Database.prefix
+    local phoneNumber = Framework.GetPhone(source)
+
+    if not phoneNumber then
+        TriggerClientEvent('phone:receiveData', source, 'messages', {})
+        return
+    end
+
+    local messages = MySQL.query.await(([[
         SELECT m.*, COALESCE(c.name, m.sender) as sender_name
-        FROM phone_messages m
-        LEFT JOIN phone_contacts c ON c.owner = ? AND c.number = m.sender
+        FROM %smessages m
+        LEFT JOIN %scontacts c ON c.owner = ? AND c.number = m.sender
         WHERE m.sender = ? OR m.receiver = ?
-        ORDER BY m.created_at DESC LIMIT 100
-    ]], {identifier, identifier, identifier})
-    TriggerClientEvent('phone:receiveData', source, 'messages', messages or {})
+        ORDER BY m.created_at DESC LIMIT 200
+    ]]):format(prefix, prefix), {identifier, phoneNumber, phoneNumber}) or {}
+
+    TriggerClientEvent('phone:receiveData', source, 'messages', messages)
 end
 
 function SendChirper(source, identifier)
