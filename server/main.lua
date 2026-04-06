@@ -1,0 +1,127 @@
+--[[
+    SERVER MAIN
+    Controle principal do servidor
+]]
+
+-- Player data cache
+PlayerCache = {}
+
+-- ============================================
+-- PLAYER LOADED
+-- ============================================
+RegisterNetEvent('phone:playerLoaded')
+AddEventHandler('phone:playerLoaded', function(data)
+    local source = source
+    PlayerCache[source] = data
+end)
+
+-- ============================================
+-- REQUEST ALL DATA
+-- ============================================
+RegisterNetEvent('phone:requestAllData')
+AddEventHandler('phone:requestAllData', function()
+    local source = source
+    local identifier = Framework.GetIdentifier(source)
+    
+    if not identifier then return end
+    
+    -- Send all data
+    SendContacts(source, identifier)
+    SendMessages(source, identifier)
+    SendChirper(source, identifier)
+    SendPictura(source, identifier)
+    SendFlamer(source, identifier)
+    SendGallery(source, identifier)
+    SendNotes(source, identifier)
+    SendCalls(source, identifier)
+    SendEmails(source, identifier)
+    SendBank(source)
+    SendInstalledApps(source, identifier)
+end)
+
+-- ============================================
+-- HELPER FUNCTIONS
+-- ============================================
+function SendContacts(source, identifier)
+    local contacts = MySQL.query.await('SELECT * FROM phone_contacts WHERE owner = ? ORDER BY name', {identifier})
+    TriggerClientEvent('phone:receiveData', source, 'contacts', contacts or {})
+end
+
+function SendMessages(source, identifier)
+    local messages = MySQL.query.await([[
+        SELECT m.*, COALESCE(c.name, m.sender) as sender_name
+        FROM phone_messages m
+        LEFT JOIN phone_contacts c ON c.owner = ? AND c.number = m.sender
+        WHERE m.sender = ? OR m.receiver = ?
+        ORDER BY m.created_at DESC LIMIT 100
+    ]], {identifier, identifier, identifier})
+    TriggerClientEvent('phone:receiveData', source, 'messages', messages or {})
+end
+
+function SendChirper(source, identifier)
+    local tweets = MySQL.query.await([[
+        SELECT t.*, (SELECT COUNT(*) FROM phone_chirper_likes WHERE tweet_id = t.id AND user_id = ?) as user_liked
+        FROM phone_chirper t ORDER BY t.created_at DESC LIMIT ?
+    ]], {identifier, Config.Chirper.maxTweets})
+    TriggerClientEvent('phone:receiveData', source, 'twitter', tweets or {})
+end
+
+function SendPictura(source, identifier)
+    local posts = MySQL.query.await('SELECT * FROM phone_pictura ORDER BY created_at DESC LIMIT ?', {Config.Pictura.maxPosts})
+    local stories = MySQL.query.await('SELECT * FROM phone_pictura_stories WHERE created_at > DATE_SUB(NOW(), INTERVAL ? HOUR)', {Config.Pictura.storyDuration})
+    TriggerClientEvent('phone:receiveData', source, 'instagram', {posts = posts or {}, stories = stories or {}})
+end
+
+function SendFlamer(source, identifier)
+    local profile = MySQL.query.await('SELECT * FROM phone_flamer_profiles WHERE user_id = ?', {identifier})
+    local profiles = MySQL.query.await([[
+        SELECT p.* FROM phone_flamer_profiles p
+        WHERE p.user_id != ? AND p.active = TRUE
+        AND p.user_id NOT IN (SELECT swiped FROM phone_flamer_swipes WHERE swiper = ?)
+        LIMIT ?
+    ]], {identifier, identifier, Config.Flamer.maxProfiles})
+    local matches = MySQL.query.await([[
+        SELECT m.*, p.name, p.photos, p.bio FROM phone_flamer_matches m
+        JOIN phone_flamer_profiles p ON ((m.user1 = ? AND p.user_id = m.user2) OR (m.user2 = ? AND p.user_id = m.user1))
+        ORDER BY m.created_at DESC
+    ]], {identifier, identifier})
+    
+    TriggerClientEvent('phone:receiveData', source, 'tinder', {
+        profile = profile and profile[1] or nil,
+        profiles = profiles or {},
+        matches = matches or {}
+    })
+end
+
+function SendGallery(source, identifier)
+    local photos = MySQL.query.await('SELECT * FROM phone_gallery WHERE owner = ? ORDER BY created_at DESC', {identifier})
+    TriggerClientEvent('phone:receiveData', source, 'gallery', photos or {})
+end
+
+function SendNotes(source, identifier)
+    local notes = MySQL.query.await('SELECT * FROM phone_notes WHERE owner = ? ORDER BY updated_at DESC', {identifier})
+    TriggerClientEvent('phone:receiveData', source, 'notes', notes or {})
+end
+
+function SendCalls(source, identifier)
+    local calls = MySQL.query.await([[
+        SELECT c.*, COALESCE(cont.name, c.caller) as caller_name FROM phone_calls c
+        LEFT JOIN phone_contacts cont ON cont.owner = ? AND cont.number = c.caller
+        WHERE c.caller = ? OR c.receiver = ? ORDER BY c.created_at DESC LIMIT 50
+    ]], {identifier, identifier, identifier})
+    TriggerClientEvent('phone:receiveData', source, 'calls', calls or {})
+end
+
+function SendBank(source)
+    local cash = Framework.GetMoney(source)
+    local bank = Framework.GetBank(source)
+    TriggerClientEvent('phone:receiveData', source, 'bank', {cash = cash, bank = bank})
+end
+
+-- ============================================
+-- CLEANUP
+-- ============================================
+AddEventHandler('playerDropped', function()
+    local source = source
+    PlayerCache[source] = nil
+end)

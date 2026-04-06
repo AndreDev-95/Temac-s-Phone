@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iPhone Phone - More Apps</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .phone-frame { flex-shrink: 0; }
+        #phone-container { position: relative !important; right: auto !important; top: auto !important; transform: none !important; }
+        .preview-label { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%); color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-size: 14px; font-weight: 600; white-space: nowrap; }
+        .phone-wrapper { position: relative; margin-bottom: 40px; }
+    </style>
+</head>
+<body>
+    <!-- Messages Preview -->
+    <div class="phone-wrapper">
+        <div class="phone-frame">
+            <div class="dynamic-island"><div class="island-content"><div class="island-camera"></div></div></div>
+            <div class="status-bar">
+                <div class="status-left"><span class="time">12:30</span></div>
+                <div class="status-right"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><div class="battery"><i class="fas fa-battery-full"></i></div></div>
+            </div>
+            <div class="phone-screen">
+                <div class="screen app-screen active" style="display:flex">
+                    <div class="app-header">
+                        <button class="back-btn"><i class="fas fa-chevron-left"></i></button>
+                        <h1>Mensagens</h1>
+                        <button class="header-btn"><i class="fas fa-square-pen"></i></button>
+                    </div>
+                    <div class="app-content" style="flex:1;overflow:hidden">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Buscar">
+                        </div>
+                        <div class="conversations-list">
+                            <div class="conversation-item">
+                                <div class="avatar" style="background:var(--ios-blue)"><i class="fas fa-user"></i></div>
+                                <div class="conversation-info">
+                                    <div class="conversation-name">Carlos Mecânico</div>
+                                    <div class="conversation-preview">Tá pronto! Pode vir buscar 👍</div>
+                                </div>
+                                <div class="conversation-time">10:45</div>
+                            </div>
+                            <div class="conversation-item">
+                                <div class="avatar" style="background:var(--ios-green)"><i class="fas fa-user"></i></div>
+                                <div class="conversation-info">
+                                    <div class="conversation-name">Maria</div>
+                                    <div class="conversation-preview">A gente se vê mais tarde então!</div>
+                                </div>
+                                <div class="conversation-time">09:30</div>
+                            </div>
+                            <div class="conversation-item">
+                                <div class="avatar" style="background:var(--ios-orange)"><i class="fas fa-user"></i></div>
+                                <div class="conversation-info">
+                                    <div class="conversation-name">Táxi LS</div>
+                                    <div class="conversation-preview">Obrigado pela corrida!</div>
+                                </div>
+                                <div class="conversation-time">Ontem</div>
+                            </div>
+                            <div class="conversation-item">
+                                <div class="avatar" style="background:var(--ios-purple)"><i class="fas fa-user"></i></div>
+                                <div class="conversation-info">
+                                    <div class="conversation-name">Pedro</div>
+                                    <div class="conversation-preview">Beleza mano, fechado!</div>
+                                </div>
+                                <div class="conversation-time">Ontem</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="preview-label">Mensagens</div>
+    </div>
+
+    <!-- Calculator Preview -->
+    <div class="phone-wrapper">
+        <div class="phone-frame">
+            <div class="dynamic-island"><div class="island-content"><div class="island-camera"></div></div></div>
+            <div class="status-bar">
+                <div class="status-left"><span class="time">12:30</span></div>
+                <div class="status-right"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><div class="battery"><i class="fas fa-battery-full"></i></div></div>
+            </div>
+            <div class="phone-screen">
+                <div class="screen app-screen active" style="display:flex">
+                    <div class="app-header calc-header" style="border:none">
+                        <button class="back-btn"><i class="fas fa-chevron-left"></i></button>
+                    </div>
+                    <div class="calculator" style="flex:1;display:flex;flex-direction:column">
+                        <div class="calc-display" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:20px;text-align:right">
+                            <div class="calc-history" style="color:var(--text-secondary);font-size:24px">1250 × 3 =</div>
+                            <div class="calc-result" style="color:var(--text-primary);font-size:70px;font-weight:300">3750</div>
+                        </div>
+                        <div class="calc-buttons" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:12px;padding-bottom:50px">
+                            <button class="calc-btn function">AC</button>
+                            <button class="calc-btn function">±</button>
+                            <button class="calc-btn function">%</button>
+                            <button class="calc-btn operator">÷</button>
+                            <button class="calc-btn">7</button>
+                            <button class="calc-btn">8</button>
+                            <button class="calc-btn">9</button>
+                            <button class="calc-btn operator">×</button>
+                            <button class="calc-btn">4</button>
+                            <button class="calc-btn">5</button>
+                            <button class="calc-btn">6</button>
+                            <button class="calc-btn operator">−</button>
+                            <button class="calc-btn">1</button>
+                            <button class="calc-btn">2</button>
+                            <button class="calc-btn">3</button>
+                            <button class="calc-btn operator">+</button>
+                            <button class="calc-btn zero">0</button>
+                            <button class="calc-btn">.</button>
+                            <button class="calc-btn operator">=</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="preview-label">Calculadora</div>
+    </div>
+
+    <!-- Weather Preview -->
+    <div class="phone-wrapper">
+        <div class="phone-frame">
+            <div class="dynamic-island"><div class="island-content"><div class="island-camera"></div></div></div>
+            <div class="status-bar" style="color:white">
+                <div class="status-left"><span class="time">12:30</span></div>
+                <div class="status-right"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><div class="battery"><i class="fas fa-battery-full"></i></div></div>
+            </div>
+            <div class="phone-screen">
+                <div class="screen active" style="display:flex">
+                    <div class="weather-bg" style="height:100%;background:linear-gradient(180deg,#5AC8FA 0%,#007AFF 100%);padding:60px 20px 20px;color:white;display:flex;flex-direction:column">
+                        <button class="back-btn weather-back" style="position:absolute;top:60px;left:16px;color:white"><i class="fas fa-chevron-left"></i></button>
+                        <div class="weather-main" style="text-align:center;flex:1;display:flex;flex-direction:column;justify-content:center">
+                            <div class="weather-location" style="font-size:28px;font-weight:500">Los Santos</div>
+                            <div class="weather-temp" style="font-size:96px;font-weight:200;line-height:1;margin:10px 0">28°</div>
+                            <div class="weather-condition" style="font-size:20px">Ensolarado</div>
+                            <div class="weather-minmax" style="font-size:16px;margin-top:8px;opacity:0.9">Máx: 32° Mín: 22°</div>
+                        </div>
+                        <div class="weather-hourly" style="display:flex;justify-content:space-between;padding:20px 0;border-top:1px solid rgba(255,255,255,0.3);margin-bottom:30px">
+                            <div class="hour" style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px">
+                                <span>Agora</span>
+                                <i class="fas fa-sun" style="font-size:24px"></i>
+                                <span>28°</span>
+                            </div>
+                            <div class="hour" style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px">
+                                <span>14h</span>
+                                <i class="fas fa-sun" style="font-size:24px"></i>
+                                <span>30°</span>
+                            </div>
+                            <div class="hour" style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px">
+                                <span>15h</span>
+                                <i class="fas fa-cloud-sun" style="font-size:24px"></i>
+                                <span>29°</span>
+                            </div>
+                            <div class="hour" style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px">
+                                <span>16h</span>
+                                <i class="fas fa-cloud" style="font-size:24px"></i>
+                                <span>27°</span>
+                            </div>
+                            <div class="hour" style="display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px">
+                                <span>17h</span>
+                                <i class="fas fa-cloud" style="font-size:24px"></i>
+                                <span>25°</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="preview-label">Clima</div>
+    </div>
+</body>
+</html>

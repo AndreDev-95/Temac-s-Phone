@@ -1,0 +1,2981 @@
+/* ============================================
+   IPHONE STYLE PHONE - CSS
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+:root {
+    /* iOS Colors */
+    --ios-blue: #007AFF;
+    --ios-green: #34C759;
+    --ios-red: #FF3B30;
+    --ios-orange: #FF9500;
+    --ios-yellow: #FFCC00;
+    --ios-pink: #FF2D55;
+    --ios-purple: #AF52DE;
+    --ios-teal: #5AC8FA;
+    --ios-gray: #8E8E93;
+    --ios-gray2: #AEAEB2;
+    --ios-gray3: #C7C7CC;
+    --ios-gray4: #D1D1D6;
+    --ios-gray5: #E5E5EA;
+    --ios-gray6: #F2F2F7;
+    
+    /* Background */
+    --bg-primary: #000000;
+    --bg-secondary: #1C1C1E;
+    --bg-tertiary: #2C2C2E;
+    --bg-grouped: #1C1C1E;
+    
+    /* Text */
+    --text-primary: #FFFFFF;
+    --text-secondary: #8E8E93;
+    --text-tertiary: #48484A;
+    
+    /* Phone dimensions */
+    --phone-width: 375px;
+    --phone-height: 812px;
+    --phone-radius: 50px;
+    --status-height: 44px;
+    --home-indicator-height: 34px;
+    
+    /* Flamer */
+    --flamer-pink: #FE3C72;
+    --flamer-orange: #FF6036;
+    
+    /* Pictura */
+    --ig-gradient: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+    
+    /* Chirper */
+    --chirper-blue: #1DA1F2;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ============================================
+   PHONE FRAME
+   ============================================ */
+#phone-container {
+    position: fixed;
+    right: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 9999;
+}
+
+.phone-frame {
+    width: var(--phone-width);
+    height: var(--phone-height);
+    background: #000;
+    border-radius: var(--phone-radius);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 0 0 3px #1a1a1a,
+        0 0 0 6px #0d0d0d,
+        0 25px 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Dynamic Island */
+.dynamic-island {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 37px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.island-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.island-camera {
+    width: 12px;
+    height: 12px;
+    background: #1a1a2e;
+    border-radius: 50%;
+    position: relative;
+}
+
+.island-camera::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #0a3d62;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Status Bar */
+.status-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--status-height);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 0 28px 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 50;
+}
+
+.status-left .time {
+    font-weight: 600;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.battery {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* ============================================
+   SCREENS
+   ============================================ */
+.phone-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.screen.active {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ============================================
+   LOCK SCREEN
+   ============================================ */
+.lock-screen {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 100px;
+}
+
+.lock-time {
+    font-size: 82px;
+    font-weight: 200;
+    letter-spacing: -2px;
+    color: var(--text-primary);
+}
+
+.lock-date {
+    font-size: 20px;
+    color: var(--text-primary);
+    margin-top: 5px;
+    font-weight: 400;
+}
+
+.lock-notifications {
+    flex: 1;
+    width: 100%;
+    padding: 30px 20px;
+}
+
+.swipe-unlock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 50px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ============================================
+   HOME SCREEN
+   ============================================ */
+.home-screen {
+    padding-top: var(--status-height);
+}
+
+.wallpaper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    z-index: 0;
+}
+
+.wallpaper.wallpaper1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.wallpaper.wallpaper2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.wallpaper.wallpaper3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.wallpaper.wallpaper4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+.wallpaper.wallpaper5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.wallpaper.wallpaper6 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); }
+.wallpaper.wallpaper7 { background: linear-gradient(180deg, #0f0c29 0%, #302b63 50%, #24243e 100%); }
+.wallpaper.wallpaper8 { background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%); }
+
+.app-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px 15px;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+    overflow-y: auto;
+    max-height: calc(100% - 150px);
+}
+
+.app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.app-item:active {
+    transform: scale(0.9);
+}
+
+.app-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.app-name {
+    font-size: 11px;
+    color: var(--text-primary);
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* App Icon Colors */
+.phone-icon { background: linear-gradient(135deg, #5CD85A 0%, #28A745 100%); }
+.messages-icon { background: linear-gradient(135deg, #5CD85A 0%, #28A745 100%); }
+.contacts-icon { background: linear-gradient(135deg, #8E8E93 0%, #636366 100%); }
+.camera-icon { background: linear-gradient(135deg, #8E8E93 0%, #48484A 100%); }
+.gallery-icon { background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 50%, #FFD93D 100%); }
+.settings-icon { background: linear-gradient(135deg, #8E8E93 0%, #636366 100%); }
+.chirper-icon { background: var(--chirper-blue); }
+.pictura-icon { background: var(--ig-gradient); }
+.flamer-icon { background: linear-gradient(135deg, var(--flamer-orange) 0%, var(--flamer-pink) 100%); }
+.bank-icon { background: linear-gradient(135deg, #28A745 0%, #155724 100%); }
+.wallet-icon { background: linear-gradient(135deg, #2C2C2E 0%, #1C1C1E 100%); }
+.taxi-icon { background: linear-gradient(135deg, #FFD93D 0%, #F4A100 100%); }
+.mechanic-icon { background: linear-gradient(135deg, #6C757D 0%, #495057 100%); }
+.police-icon { background: linear-gradient(135deg, #007BFF 0%, #0056B3 100%); }
+.ambulance-icon { background: linear-gradient(135deg, #DC3545 0%, #A71D2A 100%); }
+.music-icon { background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%); }
+.vidstream-icon { background: #FF0000; }
+.notes-icon { background: linear-gradient(135deg, #FFEB3B 0%, #FFC107 100%); color: #333 !important; }
+.calculator-icon { background: linear-gradient(135deg, #48484A 0%, #2C2C2E 100%); }
+.weather-icon { background: linear-gradient(135deg, #5AC8FA 0%, #007AFF 100%); }
+.maps-icon { background: linear-gradient(135deg, #5CD85A 0%, #28A745 100%); }
+.email-icon { background: linear-gradient(135deg, #007AFF 0%, #0056B3 100%); }
+.realestate-icon { background: linear-gradient(135deg, #A18CD1 0%, #FBC2EB 100%); }
+.darkweb-icon { background: linear-gradient(135deg, #000000 0%, #434343 100%); }
+
+/* Dock */
+.dock {
+    position: absolute;
+    bottom: var(--home-indicator-height);
+    left: 10px;
+    right: 10px;
+    height: 90px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 35px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    z-index: 10;
+}
+
+.dock-app {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.dock-app:active {
+    transform: scale(0.9);
+}
+
+.dock-app .app-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 3px;
+    z-index: 10;
+}
+
+/* ============================================
+   APP SCREENS
+   ============================================ */
+.app-screen {
+    background: var(--bg-primary);
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 16px 12px;
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.app-header h1 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.back-btn, .header-btn {
+    background: none;
+    border: none;
+    color: var(--ios-blue);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.app-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: var(--home-indicator-height);
+}
+
+/* Search Bar */
+.search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-tertiary);
+    margin: 10px 16px;
+    padding: 10px 12px;
+    border-radius: 10px;
+}
+
+.search-bar i {
+    color: var(--text-secondary);
+}
+
+.search-bar input {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+}
+
+.search-bar input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   PHONE APP
+   ============================================ */
+.phone-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.phone-tabs .tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+    position: relative;
+}
+
+.phone-tabs .tab.active {
+    color: var(--ios-blue);
+}
+
+.phone-tabs .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--ios-blue);
+}
+
+.tab-content {
+    display: none;
+    padding: 16px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--text-secondary);
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+/* Dialer */
+.dialer {
+    padding: 20px;
+}
+
+#dial-number {
+    width: 100%;
+    text-align: center;
+    font-size: 36px;
+    font-weight: 300;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    outline: none;
+}
+
+.keypad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.key {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background: var(--bg-tertiary);
+    border: none;
+    color: var(--text-primary);
+    font-size: 32px;
+    font-weight: 300;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: background 0.2s;
+}
+
+.key:active {
+    background: var(--ios-gray);
+}
+
+.key span {
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: -2px;
+}
+
+.dial-actions {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+}
+
+.call-btn {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background: var(--ios-green);
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Call List */
+.call-list, .contacts-list, .conversations-list {
+    padding: 0 16px;
+}
+
+.call-item, .contact-item, .conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+    cursor: pointer;
+}
+
+.call-item:active, .contact-item:active, .conversation-item:active {
+    background: var(--bg-tertiary);
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ios-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    margin-right: 12px;
+}
+
+.avatar.small {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+}
+
+.avatar.large {
+    width: 60px;
+    height: 60px;
+    font-size: 24px;
+}
+
+.call-info, .contact-info, .conversation-info {
+    flex: 1;
+}
+
+.call-name, .contact-name, .conversation-name {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.call-name.missed {
+    color: var(--ios-red);
+}
+
+.call-detail, .contact-number, .conversation-preview {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.call-time, .conversation-time {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.call-action {
+    color: var(--ios-blue);
+    font-size: 20px;
+    margin-left: 12px;
+}
+
+/* ============================================
+   MESSAGES
+   ============================================ */
+.conversation-header .conversation-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.message-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.message-bubble.sent {
+    background: var(--ios-blue);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.message-bubble.received {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+    margin: 8px 0;
+}
+
+.message-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.input-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ios-blue);
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.message-input-container input {
+    flex: 1;
+    padding: 10px 14px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 20px;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+}
+
+.send-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ios-blue);
+    border: none;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ============================================
+   MODAL
+   ============================================ */
+.modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    z-index: 200;
+    display: none;
+    flex-direction: column;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 16px 12px;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.modal-header h2 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.modal-header button {
+    background: none;
+    border: none;
+    color: var(--ios-blue);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.modal-body {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 16px;
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: none;
+    font-family: inherit;
+}
+
+.contact-avatar-edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.contact-avatar-edit button {
+    background: none;
+    border: none;
+    color: var(--ios-blue);
+    font-size: 14px;
+    margin-top: 8px;
+    cursor: pointer;
+}
+
+/* ============================================
+   TWITTER
+   ============================================ */
+.chirper-header {
+    background: var(--bg-primary);
+}
+
+.chirper-logo {
+    color: var(--chirper-blue);
+    font-size: 28px;
+}
+
+.chirper-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.chirper-tabs .tab {
+    flex: 1;
+    padding: 16px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+}
+
+.chirper-tabs .tab.active {
+    color: var(--text-primary);
+}
+
+.chirper-tabs .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--chirper-blue);
+    border-radius: 2px;
+}
+
+.tweets-feed {
+    padding: 0;
+}
+
+.tweet-item {
+    display: flex;
+    padding: 16px;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.tweet-item .avatar {
+    flex-shrink: 0;
+}
+
+.tweet-content {
+    flex: 1;
+    margin-left: 12px;
+}
+
+.tweet-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.tweet-author {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.tweet-verified {
+    color: var(--chirper-blue);
+    font-size: 14px;
+}
+
+.tweet-handle {
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+.tweet-time {
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+.tweet-text {
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.4;
+    margin-top: 4px;
+}
+
+.tweet-image {
+    margin-top: 12px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.tweet-image img {
+    width: 100%;
+    display: block;
+}
+
+.tweet-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 12px;
+    max-width: 300px;
+}
+
+.tweet-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px;
+}
+
+.tweet-action:hover {
+    color: var(--chirper-blue);
+}
+
+.tweet-action.liked {
+    color: var(--ios-red);
+}
+
+.tweet-action.retweeted {
+    color: var(--ios-green);
+}
+
+.chirper-nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.chirper-nav button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.chirper-nav button.active {
+    color: var(--chirper-blue);
+}
+
+/* New Tweet Modal */
+.tweet-modal .modal-header {
+    padding-top: 16px;
+}
+
+.tweet-btn {
+    background: var(--chirper-blue);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.tweet-compose {
+    display: flex;
+    gap: 12px;
+}
+
+.tweet-compose textarea {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 18px;
+    resize: none;
+    min-height: 120px;
+    outline: none;
+}
+
+.tweet-char-count {
+    text-align: right;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.tweet-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.tweet-actions button {
+    background: none;
+    border: none;
+    color: var(--chirper-blue);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ============================================
+   INSTAGRAM
+   ============================================ */
+.pictura-header {
+    background: var(--bg-primary);
+}
+
+.pictura-logo {
+    font-family: 'Billabong', cursive;
+    font-size: 28px;
+    color: var(--text-primary);
+    font-style: italic;
+    font-weight: 400;
+}
+
+.pictura-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.pictura-actions button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.stories-bar {
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.story {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.story-avatar {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    padding: 2px;
+    background: var(--ig-gradient);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.story-avatar::before {
+    content: '';
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--bg-primary);
+    position: absolute;
+}
+
+.story-avatar img {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    position: relative;
+    z-index: 1;
+}
+
+.your-story .story-avatar {
+    background: var(--bg-tertiary);
+}
+
+.your-story .story-avatar i {
+    color: var(--ios-blue);
+    font-size: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.story span {
+    font-size: 11px;
+    color: var(--text-primary);
+}
+
+.pictura-feed {
+    padding-bottom: 60px;
+}
+
+.ig-post {
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.ig-post-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+}
+
+.ig-post-header .avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.ig-post-header .username {
+    flex: 1;
+    margin-left: 12px;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ig-post-header button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.ig-post-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: var(--bg-tertiary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ig-post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ig-post-image i {
+    font-size: 48px;
+    color: var(--text-secondary);
+}
+
+.ig-post-actions {
+    display: flex;
+    padding: 12px 16px;
+    gap: 16px;
+}
+
+.ig-post-actions button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.ig-post-actions button.liked {
+    color: var(--ios-red);
+}
+
+.ig-post-actions .bookmark {
+    margin-left: auto;
+}
+
+.ig-post-likes {
+    padding: 0 16px;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.ig-post-caption {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--text-primary);
+}
+
+.ig-post-caption .username {
+    font-weight: 600;
+    margin-right: 4px;
+}
+
+.ig-post-time {
+    padding: 4px 16px 12px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.pictura-nav {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 0 calc(12px + var(--home-indicator-height));
+    background: var(--bg-primary);
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.pictura-nav button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* ============================================
+   TINDER
+   ============================================ */
+.flamer-header {
+    background: var(--bg-primary);
+}
+
+.flamer-logo {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--flamer-pink);
+    font-size: 24px;
+    font-weight: 700;
+    text-transform: lowercase;
+}
+
+.flamer-logo i {
+    font-size: 28px;
+}
+
+.flamer-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.flamer-actions button {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.flamer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.flamer-cards {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flamer-card {
+    position: absolute;
+    width: 100%;
+    max-width: 320px;
+    height: 400px;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg-tertiary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    cursor: grab;
+}
+
+.flamer-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.flamer-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px 20px 20px;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+}
+
+.flamer-card-name {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.flamer-card-age {
+    font-size: 24px;
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+.flamer-card-bio {
+    font-size: 14px;
+    margin-top: 4px;
+    opacity: 0.9;
+}
+
+.flamer-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.flamer-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.flamer-btn:active {
+    transform: scale(0.95);
+}
+
+.flamer-btn.undo {
+    background: white;
+    color: var(--ios-orange);
+    font-size: 18px;
+}
+
+.flamer-btn.nope {
+    width: 60px;
+    height: 60px;
+    background: white;
+    color: var(--ios-red);
+    font-size: 24px;
+}
+
+.flamer-btn.super {
+    background: white;
+    color: var(--ios-blue);
+    font-size: 18px;
+}
+
+.flamer-btn.like {
+    width: 60px;
+    height: 60px;
+    background: white;
+    color: var(--ios-green);
+    font-size: 24px;
+}
+
+.flamer-btn.boost {
+    background: white;
+    color: var(--ios-purple);
+    font-size: 18px;
+}
+
+/* Flamer Profile */
+.flamer-profile-photos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    padding: 16px;
+}
+
+.photo-slot {
+    aspect-ratio: 1;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    font-size: 24px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-slot.main {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+
+.photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Matches */
+.matches-grid {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+.match-item {
+    width: 100px;
+    flex-shrink: 0;
+}
+
+.match-avatar {
+    width: 100px;
+    height: 130px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.match-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.match-avatar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--flamer-pink);
+    border-radius: 8px;
+}
+
+.match-name {
+    font-size: 12px;
+    color: var(--text-primary);
+    text-align: center;
+    margin-top: 4px;
+}
+
+/* ============================================
+   BANK
+   ============================================ */
+.bank-header {
+    background: linear-gradient(135deg, #155724 0%, #28A745 100%);
+}
+
+.bank-header h1 {
+    color: white;
+}
+
+.bank-header .back-btn, .bank-header .header-btn {
+    color: white;
+}
+
+.bank-content {
+    padding: 20px;
+}
+
+.bank-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 16px;
+    padding: 24px;
+    color: white;
+    margin-bottom: 24px;
+}
+
+.card-balance {
+    margin-bottom: 24px;
+}
+
+.card-balance span {
+    font-size: 12px;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
+
+.card-balance h2 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-top: 4px;
+}
+
+.card-number {
+    font-size: 18px;
+    letter-spacing: 2px;
+    font-family: monospace;
+    margin-bottom: 16px;
+}
+
+.card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-info i {
+    font-size: 32px;
+}
+
+.bank-actions {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.bank-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 8px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 12px;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.bank-action i {
+    font-size: 20px;
+    color: var(--ios-green);
+}
+
+.bank-action span {
+    font-size: 11px;
+}
+
+.wallet-section {
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.wallet-section h3 {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.wallet-balance {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-primary);
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.wallet-balance i {
+    color: var(--ios-orange);
+}
+
+/* ============================================
+   CAMERA
+   ============================================ */
+.camera-view {
+    position: relative;
+    height: 100%;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+}
+
+.camera-overlay {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 16px;
+    z-index: 10;
+}
+
+.camera-back, .flash-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.camera-controls {
+    margin-top: auto;
+    padding: 20px;
+    padding-bottom: calc(20px + var(--home-indicator-height));
+}
+
+.camera-modes {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.camera-modes span {
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.camera-modes span.active {
+    color: var(--ios-yellow);
+}
+
+.camera-buttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.capture-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: white;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+}
+
+.gallery-preview, .switch-camera {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--bg-tertiary);
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ============================================
+   GALLERY
+   ============================================ */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 2px;
+}
+
+.gallery-item {
+    aspect-ratio: 1;
+    background: var(--bg-tertiary);
+    cursor: pointer;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================
+   SETTINGS
+   ============================================ */
+.settings-content {
+    padding: 0;
+}
+
+.settings-profile {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: var(--bg-secondary);
+    margin-bottom: 20px;
+}
+
+.settings-profile .avatar {
+    margin-right: 16px;
+}
+
+.profile-info h3 {
+    color: var(--text-primary);
+    font-size: 20px;
+}
+
+.profile-info span {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.settings-group {
+    background: var(--bg-secondary);
+    margin-bottom: 20px;
+    border-radius: 10px;
+    margin: 0 16px 20px;
+    overflow: hidden;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+}
+
+.settings-item:not(:last-child) {
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.setting-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    margin-right: 12px;
+}
+
+.setting-icon.airplane { background: var(--ios-orange); }
+.setting-icon.wifi { background: var(--ios-blue); }
+.setting-icon.bluetooth { background: var(--ios-blue); }
+.setting-icon.notifications { background: var(--ios-red); }
+.setting-icon.sounds { background: var(--ios-pink); }
+.setting-icon.display { background: var(--ios-purple); }
+.setting-icon.wallpaper { background: var(--ios-teal); }
+
+.settings-item span {
+    flex: 1;
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.settings-item i:last-child {
+    color: var(--text-secondary);
+}
+
+.toggle {
+    width: 50px;
+    height: 30px;
+    background: var(--bg-tertiary);
+    border-radius: 15px;
+    position: relative;
+    transition: background 0.3s;
+}
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+}
+
+.toggle.active {
+    background: var(--ios-green);
+}
+
+.toggle.active::after {
+    transform: translateX(20px);
+}
+
+/* Wallpaper Grid */
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
+}
+
+.wallpaper-option {
+    aspect-ratio: 9/16;
+    border-radius: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.wallpaper-option.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    background: var(--ios-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+/* ============================================
+   NOTES
+   ============================================ */
+.notes-list {
+    padding: 16px;
+}
+
+.note-item {
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+}
+
+.note-title {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.note-preview {
+    color: var(--text-secondary);
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.note-date {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.note-title-input {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 17px;
+    font-weight: 600;
+    width: 100%;
+    outline: none;
+}
+
+.note-content-input {
+    width: 100%;
+    height: calc(100% - 20px);
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    padding: 16px;
+    resize: none;
+    outline: none;
+}
+
+/* ============================================
+   CALCULATOR
+   ============================================ */
+.calc-header {
+    background: var(--bg-primary);
+    border: none;
+}
+
+.calculator {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding-top: 60px;
+}
+
+.calc-display {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    text-align: right;
+}
+
+.calc-history {
+    color: var(--text-secondary);
+    font-size: 24px;
+    min-height: 30px;
+}
+
+.calc-result {
+    color: var(--text-primary);
+    font-size: 80px;
+    font-weight: 300;
+    overflow: hidden;
+}
+
+.calc-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    padding: 12px;
+    padding-bottom: calc(12px + var(--home-indicator-height));
+}
+
+.calc-btn {
+    height: 75px;
+    border-radius: 50%;
+    border: none;
+    font-size: 32px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.calc-btn:active {
+    opacity: 0.7;
+}
+
+.calc-btn.function {
+    background: var(--ios-gray);
+    color: #000;
+}
+
+.calc-btn.operator {
+    background: var(--ios-orange);
+    color: white;
+}
+
+.calc-btn.zero {
+    grid-column: span 2;
+    border-radius: 40px;
+    text-align: left;
+    padding-left: 30px;
+}
+
+/* ============================================
+   MAPS
+   ============================================ */
+.maps-header {
+    padding-right: 16px;
+}
+
+.maps-search {
+    flex: 1;
+    margin: 0 12px;
+}
+
+.maps-view {
+    flex: 1;
+    background: #1a1a2e;
+    position: relative;
+}
+
+.map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+}
+
+.map-placeholder i {
+    font-size: 64px;
+    margin-bottom: 16px;
+}
+
+.quick-locations {
+    position: absolute;
+    bottom: calc(20px + var(--home-indicator-height));
+    left: 16px;
+    right: 16px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.quick-locations button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: var(--bg-secondary);
+    border: none;
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.quick-locations button i {
+    color: var(--ios-blue);
+}
+
+/* ============================================
+   SERVICES
+   ============================================ */
+.service-header {
+    padding-bottom: 24px;
+}
+
+.service-header.taxi-bg { background: linear-gradient(135deg, #FFD93D 0%, #F4A100 100%); }
+.service-header.mechanic-bg { background: linear-gradient(135deg, #6C757D 0%, #495057 100%); }
+.service-header.police-bg { background: linear-gradient(135deg, #007BFF 0%, #0056B3 100%); }
+.service-header.ambulance-bg { background: linear-gradient(135deg, #DC3545 0%, #A71D2A 100%); }
+
+.service-header h1 {
+    color: white;
+}
+
+.service-header .back-btn {
+    color: white;
+}
+
+.service-content {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.service-info {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.service-info i {
+    font-size: 64px;
+    color: var(--ios-blue);
+    margin-bottom: 16px;
+}
+
+.service-info.emergency i {
+    color: var(--ios-red);
+}
+
+.service-info h2 {
+    color: var(--text-primary);
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.service-info p {
+    color: var(--text-secondary);
+}
+
+.service-content textarea {
+    width: 100%;
+    padding: 16px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 16px;
+    resize: none;
+    min-height: 100px;
+    margin-bottom: 20px;
+    outline: none;
+}
+
+.service-call-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--ios-green);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.service-call-btn.emergency {
+    background: var(--ios-red);
+}
+
+/* ============================================
+   WEATHER
+   ============================================ */
+.weather-bg {
+    height: 100%;
+    background: linear-gradient(180deg, #5AC8FA 0%, #007AFF 100%);
+    padding: 60px 20px 20px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+}
+
+.weather-back {
+    position: absolute;
+    top: 60px;
+    left: 16px;
+    color: white;
+}
+
+.weather-main {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.weather-location {
+    font-size: 28px;
+    font-weight: 500;
+}
+
+.weather-temp {
+    font-size: 96px;
+    font-weight: 200;
+    line-height: 1;
+    margin: 10px 0;
+}
+
+.weather-condition {
+    font-size: 20px;
+}
+
+.weather-minmax {
+    font-size: 16px;
+    margin-top: 8px;
+    opacity: 0.9;
+}
+
+.weather-hourly {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: var(--home-indicator-height);
+}
+
+.hour {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.hour i {
+    font-size: 24px;
+}
+
+/* ============================================
+   CALL SCREENS
+   ============================================ */
+.call-screen {
+    background: linear-gradient(180deg, #1a1a2e 0%, #0f0f1a 100%);
+    justify-content: space-between;
+    padding: 80px 20px 50px;
+}
+
+.call-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.caller-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: var(--ios-gray);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    color: white;
+    margin-bottom: 16px;
+}
+
+.caller-name {
+    color: var(--text-primary);
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.call-status {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin-top: 8px;
+}
+
+.call-timer {
+    color: var(--text-secondary);
+    font-size: 18px;
+    margin-top: 8px;
+    font-family: monospace;
+}
+
+.call-options {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.call-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.call-option i {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.call-option span {
+    font-size: 12px;
+}
+
+.call-actions {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+}
+
+.call-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.call-action i {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+}
+
+.call-action.decline i {
+    background: var(--ios-red);
+}
+
+.call-action.accept i {
+    background: var(--ios-green);
+}
+
+.call-action span {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* ============================================
+   NOTIFICATION TOAST
+   ============================================ */
+.notification-toast {
+    position: absolute;
+    top: 60px;
+    left: 10px;
+    right: 10px;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 300;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.notification-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.notification-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--ios-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-title {
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.notification-message {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+/* ============================================
+   EMAIL
+   ============================================ */
+.email-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.email-tabs .tab {
+    flex: 1;
+    padding: 12px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.email-tabs .tab.active {
+    color: var(--ios-blue);
+    border-bottom: 2px solid var(--ios-blue);
+}
+
+.email-list {
+    padding: 0;
+}
+
+.email-item {
+    display: flex;
+    padding: 16px;
+    border-bottom: 1px solid var(--bg-tertiary);
+    cursor: pointer;
+}
+
+.email-item:active {
+    background: var(--bg-tertiary);
+}
+
+.email-unread {
+    width: 10px;
+    height: 10px;
+    background: var(--ios-blue);
+    border-radius: 50%;
+    margin-right: 12px;
+    align-self: center;
+}
+
+.email-content {
+    flex: 1;
+}
+
+.email-sender {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.email-subject {
+    color: var(--text-primary);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.email-preview {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.email-time {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* ============================================
+   DARK MODE SUPPORT
+   ============================================ */
+body.light-mode {
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F2F2F7;
+    --bg-tertiary: #E5E5EA;
+    --text-primary: #000000;
+    --text-secondary: #8E8E93;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
+/* ============================================
+   APP STORE
+   ============================================ */
+.appstore-icon { background: linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%); }
+
+.appstore-header {
+    background: var(--bg-primary);
+}
+
+.appstore-content {
+    padding-bottom: 0;
+}
+
+.store-categories {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px 12px;
+    overflow-x: auto;
+}
+
+.store-category-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 20px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.store-category-btn.active {
+    background: var(--ios-blue);
+    color: white;
+}
+
+.store-category-btn i {
+    font-size: 12px;
+}
+
+.store-apps-list {
+    padding: 0 16px;
+}
+
+.store-app-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+    cursor: pointer;
+    gap: 12px;
+}
+
+.store-app-item:active {
+    background: var(--bg-secondary);
+}
+
+.store-app-item .app-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    font-size: 24px;
+}
+
+.store-app-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.store-app-name {
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.store-app-category {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.store-app-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--ios-orange);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.store-app-rating i {
+    font-size: 10px;
+}
+
+.store-app-action {
+    flex-shrink: 0;
+}
+
+.store-get-btn {
+    padding: 6px 20px;
+    background: var(--ios-blue);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.store-get-btn:active {
+    transform: scale(0.95);
+    opacity: 0.9;
+}
+
+.store-get-btn.large {
+    padding: 10px 28px;
+    font-size: 16px;
+    border-radius: 20px;
+}
+
+.store-open-btn {
+    padding: 6px 20px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 16px;
+    color: var(--ios-blue);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.store-uninstall-btn {
+    padding: 6px 20px;
+    background: var(--ios-red);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.store-installing {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.store-progress-ring {
+    width: 24px;
+    height: 24px;
+    border: 3px solid var(--bg-tertiary);
+    border-top-color: var(--ios-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* App Detail */
+.app-detail-header-section {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 16px;
+}
+
+.app-detail-icon {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 18px !important;
+    font-size: 36px !important;
+    flex-shrink: 0;
+}
+
+.app-detail-title {
+    flex: 1;
+}
+
+.app-detail-title h2 {
+    color: var(--text-primary);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.app-detail-title p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.app-detail-stats {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    border-top: 1px solid var(--bg-tertiary);
+    border-bottom: 1px solid var(--bg-tertiary);
+    gap: 0;
+}
+
+.stat {
+    flex: 1;
+    text-align: center;
+}
+
+.stat-value {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.stat-label i {
+    color: var(--ios-orange);
+    font-size: 10px;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 40px;
+    background: var(--bg-tertiary);
+}
+
+.app-detail-section {
+    padding: 20px 16px;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.app-detail-section h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.app-detail-section p {
+    color: var(--text-secondary);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--bg-tertiary);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-row span:first-child {
+    color: var(--text-secondary);
+    font-size: 15px;
+}
+
+.info-row span:last-child {
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* ============================================
+   MUSIC APP
+   ============================================ */
+.music-header {
+    background: linear-gradient(135deg, #FC466B 0%, #3F5EFB 100%);
+}
+
+.music-header h1 {
+    color: white;
+}
+
+.music-header .back-btn {
+    color: white;
+}
+
+.music-content {
+    padding: 20px;
+}
+
+.music-now-playing {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.music-album-art {
+    width: 200px;
+    height: 200px;
+    background: var(--bg-tertiary);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 64px;
+    color: var(--text-secondary);
+    margin-bottom: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.music-track-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.music-track-name {
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.music-artist-name {
+    color: var(--text-secondary);
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+.music-progress {
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.music-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-tertiary);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.music-progress-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--ios-pink);
+    border-radius: 2px;
+    transition: width 0.3s;
+}
+
+.music-time {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.music-controls button {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.music-controls .play-btn {
+    width: 60px;
+    height: 60px;
+    background: var(--ios-pink);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.music-playlist h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+    margin: 24px 0 12px;
+}
+
+/* ============================================
+   YOUTUBE APP
+   ============================================ */
+.vidstream-header {
+    background: var(--bg-primary);
+}
+
+.vidstream-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.vidstream-logo i {
+    color: #FF0000;
+    font-size: 28px;
+}
+
+.vidstream-categories {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;
+}
+
+.vs-cat {
+    padding: 8px 14px;
+    background: var(--bg-tertiary);
+    border: none;
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.yt-cat.active {
+    background: var(--text-primary);
+    color: var(--bg-primary);
+}
+
+.vidstream-content {
+    padding-bottom: 0;
+}
+
+.vidstream-feed {
+    padding: 0 16px;
+}
+
+.vidstream-nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 calc(8px + var(--home-indicator-height));
+    background: var(--bg-primary);
+    border-top: 1px solid var(--bg-tertiary);
+}
+
+.vidstream-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.vidstream-nav button.active {
+    color: var(--text-primary);
+}
+
+.vidstream-nav button span {
+    font-size: 10px;
+}
