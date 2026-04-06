@@ -194,3 +194,33 @@ ALTER TABLE `phone_messages`
 -- Índices recomendados para bases já existentes (execute apenas se ainda não existirem):
 -- CREATE INDEX `idx_sender_receiver` ON `phone_messages` (`sender`, `receiver`);
 -- CREATE INDEX `idx_receiver_read` ON `phone_messages` (`receiver`, `is_read`);
+
+-- ============================================
+-- Chirper Upgrade (comentários + rechirps + replies)
+-- ============================================
+ALTER TABLE `phone_chirper`
+    ADD COLUMN IF NOT EXISTS `verified` TINYINT(1) DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS `reply_to` INT NULL;
+
+CREATE TABLE IF NOT EXISTS `phone_chirper_comments` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `chirp_id` INT NOT NULL,
+    `author` VARCHAR(50) NOT NULL,
+    `author_name` VARCHAR(100),
+    `author_avatar` TEXT,
+    `content` TEXT NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX `idx_chirp_comments` (`chirp_id`),
+    CONSTRAINT `fk_phone_chirper_comments_chirp`
+        FOREIGN KEY (`chirp_id`) REFERENCES `phone_chirper`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `phone_chirper_rechirps` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `chirp_id` INT NOT NULL,
+    `user_id` VARCHAR(50) NOT NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY `unique_rechirp` (`chirp_id`, `user_id`),
+    CONSTRAINT `fk_phone_chirper_rechirps_chirp`
+        FOREIGN KEY (`chirp_id`) REFERENCES `phone_chirper`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

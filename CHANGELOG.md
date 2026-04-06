@@ -44,3 +44,11 @@
 - conversa dedicada agora recarrega do servidor e marca lidas ao abrir
 - entrega offline mantida por DB ao reabrir o telefone
 - queries otimizadas para unread e histórico recente
+
+
+### feat(chirper-v1.1)
+- likes agora persistem por utilizador via tabela dedicada
+- rechirps persistentes com toggle por utilizador
+- comentários por chirp com contagem no feed
+- suporte a replies ligadas ao chirp original
+- resumo de perfil no topo do app (posts, likes, comentários, rechirps)

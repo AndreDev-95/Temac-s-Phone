@@ -22,6 +22,8 @@ const PhoneState = {
     messages: [],
     conversations: {},
     chirps: [],
+    chirperProfile: null,
+    chirperComments: {},
     picturaPosts: [],
     picturaStories: [],
     flamerProfiles: [],
@@ -350,8 +352,12 @@ window.addEventListener('message', (event) => {
             if (PhoneState.currentScreen === 'messages-app') renderMessages();
             break;
         case 'chirperProfileData':
-            PhoneState.chirperProfile = data.profile || null;
+            PhoneState.chirperProfile = data.profile || data || null;
             renderChirps();
+            break;
+        case 'chirperCommentsData':
+            PhoneState.chirperComments[data.chirpId] = data.comments || [];
+            showChirpComments(data.chirpId);
             break;
         case 'chirperTagData':
             PhoneState.chirps = data.chirps || [];
@@ -1026,13 +1032,31 @@ function handleNewMessage(msg) {
 function renderChirps() {
     const feed = document.getElementById('chirps-feed');
     if (!feed) return;
-    
+
+    const profile = PhoneState.chirperProfile || { total_chirps: 0, total_likes: 0, total_comments: 0, total_rechirps: 0 };
+
     if (PhoneState.chirps.length === 0) {
-        feed.innerHTML = '<div class="empty-state"><i class="fas fa-dove"></i><p>Nenhum chirp ainda</p></div>';
+        feed.innerHTML = `
+            <div class="chirper-profile-card">
+                <strong>Seu Chirper</strong>
+                <div class="info-row"><span>Posts</span><span>${profile.total_chirps || 0}</span></div>
+                <div class="info-row"><span>Likes</span><span>${profile.total_likes || 0}</span></div>
+                <div class="info-row"><span>Comentários</span><span>${profile.total_comments || 0}</span></div>
+                <div class="info-row"><span>Rechirps</span><span>${profile.total_rechirps || 0}</span></div>
+            </div>
+            <div class="empty-state"><i class="fas fa-dove"></i><p>Nenhum chirp ainda</p></div>`;
         return;
     }
-    
-    feed.innerHTML = PhoneState.chirps.map(chirp => `
+
+    feed.innerHTML = `
+        <div class="chirper-profile-card">
+            <strong>Seu Chirper</strong>
+            <div class="info-row"><span>Posts</span><span>${profile.total_chirps || 0}</span></div>
+            <div class="info-row"><span>Likes</span><span>${profile.total_likes || 0}</span></div>
+            <div class="info-row"><span>Comentários</span><span>${profile.total_comments || 0}</span></div>
+            <div class="info-row"><span>Rechirps</span><span>${profile.total_rechirps || 0}</span></div>
+        </div>
+        ${PhoneState.chirps.map(chirp => `
         <div class="chirp-item" data-id="${chirp.id}">
             <div class="avatar" style="background: hsl(${hashCode(chirp.author_name || '') % 360}, 70%, 50%)">
                 <span>${(chirp.author_name || 'A').charAt(0).toUpperCase()}</span>
@@ -1044,28 +1068,43 @@ function renderChirps() {
                     <span class="chirp-handle">@${(chirp.author || '').substring(0, 8)}</span>
                     <span class="chirp-time">· ${formatTime(chirp.created_at)}</span>
                 </div>
+                ${chirp.reply_to ? `
+                    <div class="chirp-reply-context" style="padding:8px 10px;border-radius:12px;background:var(--bg-tertiary);margin-bottom:8px;font-size:12px;opacity:.9;">
+                        Respondendo a <strong>${chirp.original_author_name || chirp.original_author || 'post'}</strong><br>
+                        <span>${escapeHtml((chirp.original_content || '').slice(0, 90))}${(chirp.original_content || '').length > 90 ? '…' : ''}</span>
+                    </div>` : ''}
                 <div class="chirp-text">${formatChirpText(chirp.content)}</div>
                 ${chirp.image ? `<div class="chirp-image"><img src="${chirp.image}" alt=""></div>` : ''}
                 <div class="chirp-actions">
-                    <button class="chirp-action"><i class="far fa-comment"></i> 0</button>
-                    <button class="chirp-action ${chirp.retweeted ? 'rechirped' : ''}" onclick="rechirp(${chirp.id})">
+                    <button class="chirp-action" onclick="commentChirp(${chirp.id})"><i class="far fa-comment"></i> ${chirp.comments || 0}</button>
+                    <button class="chirp-action ${chirp.user_rechirped ? 'rechirped' : ''}" onclick="rechirp(${chirp.id})">
                         <i class="fas fa-retweet"></i> ${chirp.rechirps || 0}
                     </button>
                     <button class="chirp-action ${chirp.user_liked ? 'liked' : ''}" onclick="likeChirp(${chirp.id})">
                         <i class="${chirp.user_liked ? 'fas' : 'far'} fa-heart"></i> ${chirp.likes || 0}
                     </button>
-                    <button class="chirp-action"><i class="fas fa-share"></i></button>
+                    <button class="chirp-action" onclick="copyChirpLink(${chirp.id})"><i class="fas fa-share"></i></button>
                 </div>
             </div>
         </div>
-    `).join('');
+    `).join('')}`;
 }
 
 function formatChirpText(text) {
     if (!text) return '';
+    text = escapeHtml(text);
     text = text.replace(/#(\w+)/g, '<span style="color: var(--chirper-blue)">#$1</span>');
     text = text.replace(/@(\w+)/g, '<span style="color: var(--chirper-blue)">@$1</span>');
-    return text;
+    return text.replace(/\n/g, '<br>');
+}
+
+function escapeHtml(text) {
+    return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 
 function showNewChirp() {
@@ -1076,10 +1115,10 @@ function showNewChirp() {
     showModal('new-chirp-modal');
 }
 
-function postChirp() {
+function postChirp(replyTo = null) {
     const content = document.getElementById('chirp-content')?.value.trim();
     if (content) {
-        sendNUI('postChirp', { content });
+        sendNUI('postChirp', { content, replyTo });
         hideModal('new-chirp-modal');
     }
 }
@@ -1098,14 +1137,50 @@ function rechirp(chirpId) {
     sendNUI('rechirp', { chirpId });
     const chirp = PhoneState.chirps.find(t => t.id === chirpId);
     if (chirp) {
-        chirp.rechirps = (chirp.rechirps || 0) + 1;
+        chirp.user_rechirped = !chirp.user_rechirped;
+        chirp.rechirps = Math.max(0, (chirp.rechirps || 0) + (chirp.user_rechirped ? 1 : -1));
         renderChirps();
     }
 }
 
 function handleNewChirp(chirp) {
-    PhoneState.chirps.unshift(chirp);
+    const existingIndex = PhoneState.chirps.findIndex(item => item.id === chirp.id);
+    if (existingIndex >= 0) {
+        PhoneState.chirps[existingIndex] = { ...PhoneState.chirps[existingIndex], ...chirp };
+    } else {
+        PhoneState.chirps.unshift(chirp);
+    }
     renderChirps();
+}
+
+function commentChirp(chirpId) {
+    const text = window.prompt('Responder a este chirp:');
+    if (text && text.trim()) {
+        sendNUI('commentChirp', { chirpId, content: text.trim() });
+        const chirp = PhoneState.chirps.find(t => t.id === chirpId);
+        if (chirp) {
+            chirp.comments = (chirp.comments || 0) + 1;
+            renderChirps();
+        }
+    }
+}
+
+function showChirpComments(chirpId) {
+    const comments = PhoneState.chirperComments[chirpId] || [];
+    if (!comments.length) return;
+    const output = comments
+        .slice(-8)
+        .map(comment => `${comment.author_name || 'Anónimo'}: ${comment.content}`)
+        .join('\n');
+    showNotification('Comentários', output.substring(0, 180), 'chirper');
+}
+
+function copyChirpLink(chirpId) {
+    const link = `chirper://${chirpId}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).catch(() => {});
+    }
+    showNotification('Chirper', `Link copiado: ${link}`, 'chirper');
 }
 
 // ============================================
