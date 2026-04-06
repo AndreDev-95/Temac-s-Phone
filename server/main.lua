@@ -70,15 +70,38 @@ end
 function SendChirper(source, identifier)
     local prefix = Config.Database.prefix
     local chirps = MySQL.query.await(([[
-        SELECT c.*, (
-            SELECT COUNT(*)
-            FROM %schirper_likes cl
-            WHERE cl.chirp_id = c.id AND cl.user_id = ?
-        ) as user_liked
+        SELECT
+            c.*,
+            COALESCE(l.like_count, 0) AS likes,
+            COALESCE(r.rechirp_count, 0) AS rechirps,
+            COALESCE(cm.comment_count, 0) AS comments,
+            CASE WHEN ul.id IS NOT NULL THEN 1 ELSE 0 END AS user_liked,
+            CASE WHEN ur.id IS NOT NULL THEN 1 ELSE 0 END AS user_rechirped,
+            rp.author AS original_author,
+            rp.author_name AS original_author_name,
+            rp.content AS original_content
         FROM %schirper c
+        LEFT JOIN (
+            SELECT chirp_id, COUNT(*) AS like_count
+            FROM %schirper_likes
+            GROUP BY chirp_id
+        ) l ON l.chirp_id = c.id
+        LEFT JOIN (
+            SELECT chirp_id, COUNT(*) AS rechirp_count
+            FROM %schirper_rechirps
+            GROUP BY chirp_id
+        ) r ON r.chirp_id = c.id
+        LEFT JOIN (
+            SELECT chirp_id, COUNT(*) AS comment_count
+            FROM %schirper_comments
+            GROUP BY chirp_id
+        ) cm ON cm.chirp_id = c.id
+        LEFT JOIN %schirper_likes ul ON ul.chirp_id = c.id AND ul.user_id = ?
+        LEFT JOIN %schirper_rechirps ur ON ur.chirp_id = c.id AND ur.user_id = ?
+        LEFT JOIN %schirper rp ON rp.id = c.reply_to
         ORDER BY c.created_at DESC
         LIMIT ?
-    ]]):format(prefix, prefix), {identifier, Config.Chirper.maxTweets})
+    ]]):format(prefix, prefix, prefix, prefix, prefix, prefix), {identifier, identifier, Config.Chirper.maxTweets})
 
     TriggerClientEvent('phone:receiveData', source, 'chirper', chirps or {})
 end
